@@ -1,31 +1,32 @@
 import type { NextPage } from "next";
 import styles from "../styles/Home.module.css";
-import { ConnectWallet } from "@3rdweb/react";
-import { useEffect, useMemo, useState } from "react";
-import initMarketplace from "../lib/initMarketplace";
-import { useWeb3 } from "@3rdweb/hooks";
+import { useEffect, useState } from "react";
 import { AuctionListing, DirectListing } from "@thirdweb-dev/sdk";
 import Link from "next/link";
+import { useMarketplace } from "@thirdweb-dev/react";
+import { ConnectWallet } from "../components/ConnectWallet";
 
 const Home: NextPage = () => {
   const [loadingListings, setLoadingListings] = useState<boolean>(true);
   const [listings, setListings] = useState<(AuctionListing | DirectListing)[]>(
     []
   );
-  const { provider } = useWeb3();
 
-  // Call the initMarketplace function to initialize the marketplace
-  const marketplace = useMemo(() => {
-    return initMarketplace(provider);
-  }, [provider]);
+  const marketplace = useMarketplace(
+    "0x90AC8dFF76C1692dD494e261dac5D0f6684B0674"
+  );
+
+  console.log(marketplace);
 
   useEffect(() => {
     (async () => {
-      // Get all listings from the marketplace
-      setListings(await marketplace.getAllListings());
+      if (marketplace) {
+        // Get all listings from the marketplace
+        setListings(await marketplace.getAllListings());
 
-      // Set loading to false when the listings are ready
-      setLoadingListings(false);
+        // Set loading to false when the listings are ready
+        setLoadingListings(false);
+      }
     })();
   }, [marketplace]);
 

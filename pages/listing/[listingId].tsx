@@ -1,14 +1,8 @@
-import { useWeb3 } from "@3rdweb/hooks";
-import {
-  AuctionListing,
-  DirectListing,
-  NATIVE_TOKENS,
-  NATIVE_TOKEN_ADDRESS,
-} from "@thirdweb-dev/sdk";
+import { useMarketplace } from "@thirdweb-dev/react";
+import { AuctionListing, DirectListing } from "@thirdweb-dev/sdk";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
-import { useEffect, useMemo, useState } from "react";
-import initMarketplace from "../../lib/initMarketplace";
+import { useEffect, useState } from "react";
 import styles from "../../styles/Listing.module.css";
 
 const ListingPage: NextPage = () => {
@@ -21,9 +15,6 @@ const ListingPage: NextPage = () => {
   // We do some weird TypeScript casting, because Next.JS thinks listingId can be an array for some reason.
   const { listingId } = router.query as { listingId: string };
 
-  // Again we are using the provider to make write operations for this user.
-  const { provider } = useWeb3();
-
   // Loading flag for the UI, so we can show a loading state while we wait for the data to load.
   const [loadingListing, setLoadingListing] = useState<boolean>(true);
 
@@ -35,14 +26,9 @@ const ListingPage: NextPage = () => {
     undefined | DirectListing | AuctionListing
   >(undefined);
 
-  // Call the initMarketplace function to initialize the marketplace
-  const marketplace = useMemo(() => {
-    const m = initMarketplace(provider);
-    console.log("Marketplace changed:", m);
-    return m;
-
-    // Whenever provider changes (e.g. user connects wallet), re-initialize the marketplace.
-  }, [provider]);
+  const marketplace = useMarketplace(
+    "0x90AC8dFF76C1692dD494e261dac5D0f6684B0674"
+  );
 
   // When the component mounts, ask the marketplace for the listing with the given listingId
   // Using the listingid from the URL (via router.query)
@@ -65,7 +51,7 @@ const ListingPage: NextPage = () => {
       // If the listing type is a direct listing, then we can create an offer.
       if (listing?.type === 0) {
         console.log("Making offer");
-        await marketplace.direct.makeOffer(
+        await marketplace?.direct.makeOffer(
           listingId, // The listingId of the listing we want to make an offer for
           1, // Quantity = 1
           // https://rinkeby.etherscan.io/token/0xc778417E063141139Fce010982780140Aa0cD5Ab?a=0x5069de7e4ee28b6b17e8a8d1fe699277f5db98cd
@@ -77,7 +63,7 @@ const ListingPage: NextPage = () => {
       // If the listing type is an auction listing, then we can create a bid.
       if (listing?.type === 1) {
         console.log("Making bid");
-        await marketplace.auction.makeBid(listingId, bidAmount);
+        await marketplace?.auction.makeBid(listingId, bidAmount);
       }
     } catch (error) {
       console.error(error);
@@ -87,11 +73,23 @@ const ListingPage: NextPage = () => {
   async function buyNft() {
     try {
       // Simple one-liner for buying the NFT =)
-      await marketplace.buyoutListing(listingId, 1);
+      await marketplace?.buyoutListing(listingId, 1);
     } catch (error) {
       console.error(error);
     }
   }
+
+  // Get top bid
+  // (async function topBid() {
+  //   try {
+  //     if (listingId) {
+  //       const bid = await marketplace?.auction.getWinningBid(listingId);
+  //       console.log(bid);
+  //     }
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  //   })();
 
   if (loadingListing) {
     return <div>Loading...</div>;

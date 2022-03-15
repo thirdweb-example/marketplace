@@ -1,26 +1,18 @@
-import { useWeb3 } from "@3rdweb/hooks";
+import { useMarketplace, useSigner } from "@thirdweb-dev/react";
 import { NATIVE_TOKEN_ADDRESS, TransactionResult } from "@thirdweb-dev/sdk";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
-import { useMemo } from "react";
-import initMarketplace from "../lib/initMarketplace";
 import styles from "../styles/Create.module.css";
 
 const Home: NextPage = () => {
   // Next JS Router hook to redirect to other pages
   const router = useRouter();
 
-  // A provider is used to "talk" to the blockchain. We use it to enable the user to perform write operations to the blockchain.
-  const { provider } = useWeb3();
+  const marketplace = useMarketplace(
+    "0x90AC8dFF76C1692dD494e261dac5D0f6684B0674"
+  );
 
-  // Call the initMarketplace function to initialize the marketplace
-  const marketplace = useMemo(() => {
-    const m = initMarketplace(provider);
-    console.log("Marketplace changed:", m);
-    return m;
-
-    // Whenever provider changes (e.g. user connects wallet), re-initialize the marketplace.
-  }, [provider]);
+  const signer = useSigner();
 
   // This function gets called when the form is submitted.
   async function handleCreateListing(e) {
@@ -69,14 +61,14 @@ const Home: NextPage = () => {
     price: string
   ) {
     try {
-      const transaction = await marketplace.auction.createListing({
+      const transaction = await marketplace?.auction.createListing({
         assetContractAddress: contractAddress, // Contract Address of the NFT
         buyoutPricePerToken: price, // Maximum price, the auction will end immediately if a user pays this price.
         currencyContractAddress: NATIVE_TOKEN_ADDRESS, // NATIVE_TOKEN_ADDRESS is the crpyto curency that is native to the network. i.e. Rinkeby ETH.
         listingDurationInSeconds: 60 * 60 * 24 * 7, // When the auction will be closed and no longer accept bids (1 Week)
         quantity: 1, // How many of the NFTs are being listed (useful for ERC 1155 tokens)
         reservePricePerToken: 0, // Minimum price, users cannot bid below this amount
-        startTimeInSeconds: Math.floor(Date.now() / 1000), // Start time of the auction (now)
+        startTimeInSeconds: 0, // Start time of the auction (now)
         tokenId: tokenId, // Token ID of the NFT.
       });
 
@@ -94,12 +86,11 @@ const Home: NextPage = () => {
     try {
       const transaction = await marketplace.direct.createListing({
         assetContractAddress: contractAddress, // Contract Address of the NFT
-        buyoutPricePerToken: price, // Asking price, users can buy the NFT for this price.
+        buyoutPricePerToken: price, // Maximum price, the auction will end immediately if a user pays this price.
         currencyContractAddress: NATIVE_TOKEN_ADDRESS, // NATIVE_TOKEN_ADDRESS is the crpyto curency that is native to the network. i.e. Rinkeby ETH.
         listingDurationInSeconds: 60 * 60 * 24 * 7, // When the auction will be closed and no longer accept bids (1 Week)
         quantity: 1, // How many of the NFTs are being listed (useful for ERC 1155 tokens)
-        // reservePricePerToken: 0, : Direct Listings have no reserve price
-        startTimeInSeconds: Math.floor(Date.now() / 1000), // Start time of the auction (now)
+        startTimeInSeconds: 0, // Start time of the auction (now)
         tokenId: tokenId, // Token ID of the NFT.
       });
 
