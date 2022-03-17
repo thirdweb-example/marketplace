@@ -1,18 +1,17 @@
-import { useMarketplace, useSigner } from "@thirdweb-dev/react";
+import { useMarketplace } from "@thirdweb-dev/react";
 import { NATIVE_TOKEN_ADDRESS, TransactionResult } from "@thirdweb-dev/sdk";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
 import styles from "../styles/Create.module.css";
 
-const Home: NextPage = () => {
+const Create: NextPage = () => {
   // Next JS Router hook to redirect to other pages
   const router = useRouter();
 
+  // Connect to our marketplace contract via the useMarketplace hook
   const marketplace = useMarketplace(
     "0x90AC8dFF76C1692dD494e261dac5D0f6684B0674"
   );
-
-  const signer = useSigner();
 
   // This function gets called when the form is submitted.
   async function handleCreateListing(e) {
@@ -84,7 +83,7 @@ const Home: NextPage = () => {
     price: string
   ) {
     try {
-      const transaction = await marketplace.direct.createListing({
+      const transaction = await marketplace?.direct.createListing({
         assetContractAddress: contractAddress, // Contract Address of the NFT
         buyoutPricePerToken: price, // Maximum price, the auction will end immediately if a user pays this price.
         currencyContractAddress: NATIVE_TOKEN_ADDRESS, // NATIVE_TOKEN_ADDRESS is the crpyto curency that is native to the network. i.e. Rinkeby ETH.
@@ -150,4 +149,4 @@ const Home: NextPage = () => {
   );
 };
 
-export default Home;
+export default Create;

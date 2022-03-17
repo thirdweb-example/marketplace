@@ -1,5 +1,3 @@
-# Thirdweb NFT Marketplace
-
 ## Introduction
 
 In this guide, you will learn how to create a marketplace like [OpenSea](https://opensea.io/) on the Ethereum network!
@@ -11,6 +9,10 @@ We'll implement the following features:
 - Allow users to **make bids** and **buy** our NFTs.
 
 Let's do this!
+
+If you get stuck or confused at any point, you can always grab the source code from here this repo:
+
+%[https://github.com/jarrodwatts/thirdweb-nft-marketplace]
 
 ### Pre-requisites
 
@@ -77,7 +79,7 @@ Thirdweb comes jam-packed with features and libraries that help you build in the
 Let's install them by running:
 
 ```
-npm install @3rdweb/react @3rdweb/hooks @3rdweb/sdk@nightly ethers dotenv
+npm install @thirdweb-dev/react @thirdweb-dev/sdk ethers
 ```
 
 Cool! Now, lets jump into the code by running:
@@ -102,46 +104,24 @@ Whenever you work with the blockchain and interact with tokens or contracts on a
 
 Open `pages/_app.tsx` and replace everything in this file with the following code:
 
-```
+```ts
 // pages/_app.tsx
 import "../styles/globals.css";
-import { ThirdwebProvider } from "@3rdweb/react";
 import type { AppProps } from "next/app";
+import { ChainId } from "@thirdweb-dev/sdk";
+import { ThirdwebProvider } from "@thirdweb-dev/react";
 
 const MyApp = ({ Component, pageProps }: AppProps) => {
-  // Which networks do you want to support?
-  // Rinkeby has the chainId of 4, so that's why that's in here.
-  const supportedChainIds = [4];
-
-  // Which wallet providers do you want to support?
-  //  injected - MetaMask
-  //  magic - Magic Link
-  //  walletconnect - Wallet Connect
-  //  walletlink - Coinbase Wallet
-  const connectors = {
-    injected: {},
-    walletconnect: {},
-    walletlink: {
-      appName: "thirdweb - demo",
-      url: "https://thirdweb.com",
-      darkMode: false,
-    },
-  };
-
   return (
-    // Wrap our application in the 3rdweb provider.
+    // Wrap our app in the 3rdweb provider context.
     // This allows us to access thirdweb hooks anywhere in our application.
-    <ThirdwebProvider
-      connectors={connectors}
-      supportedChainIds={supportedChainIds}
-    >
+    <ThirdwebProvider desiredChainId={ChainId.Rinkeby}>
       <Component {...pageProps} />
     </ThirdwebProvider>
   );
 };
 
 export default MyApp;
-
 ```
 
 If you are curious about the ThirdwebProvider and how its magic works behind the scenes, [we have another great tutorial here](https://portal.thirdweb.com/guides/add-connectwallet-to-your-website) that goes into more depth.
@@ -152,33 +132,54 @@ The first thing we'll want users to do is to sign in with their wallets.
 
 For this application, we'll ask users to connect their wallets on the homepage.
 
-So let's change the `pages/index.tsx` file to look like this:
+Let's create a component that enables user's to connect with [Metamask](https://metamask.io/).
 
+Create a new folder called `components`, and a file called `CreateWallet.tsx` within our new folder.
+
+Here's the code for our user's to connect their wallets:
+
+```ts
+import { useAddress, useMetamask } from "@thirdweb-dev/react";
+
+export const ConnectWallet = () => {
+  // A hook to enable users to connect with MetaMask
+  const connectWithMetamask = useMetamask();
+  // Once connected, you can get the connected wallet information from anywhere (address, signer)
+  const address = useAddress();
+  return (
+    <div>
+      {address ? (
+        <h4>Connected as {address}</h4>
+      ) : (
+        <button onClick={connectWithMetamask}>Connect Metamask Wallet</button>
+      )}
+    </div>
+  );
+};
 ```
+
+Awesome! Now, let's change the `pages/index.tsx` file to look like this:
+
+```ts
 // pages/index.tsx
 import type { NextPage } from "next";
 import styles from "../styles/Home.module.css";
-import { ConnectWallet } from "@3rdweb/react";
-import { useEffect, useMemo, useState } from "react";
-import initMarketplace from "../lib/initMarketplace";
-import { useWeb3 } from "@3rdweb/hooks";
-import { AuctionListing, DirectListing } from "@thirdweb-dev/sdk";
-import Link from "next/link";
+import { ConnectWallet } from "../components/ConnectWallet";
 
 const Home: NextPage = () => {
   return (
     <div className={styles.container}>
       <ConnectWallet />
+    </div>
   );
 };
 
 export default Home;
-
 ```
 
 Now you have a button that connects users to the correct network, and displays their balance once they're connected!
 
-![image.png](https://cdn.hashnode.com/res/hashnode/image/upload/v1646708515209/AlBPxG0PT.png)
+![image.png](https://cdn.hashnode.com/res/hashnode/image/upload/v1647477154244/dWy5I0zBr.png)
 
 That's a basic homepage already. It doesn't let a user do much besides connecting their wallet, but it's a good base for any other project you might have in mind. Before we continue, we need to have another word, though.
 
@@ -194,62 +195,23 @@ _For now, we will just assume that everything we do is safe._
 
 Now we can sign users in, let's show them what we have for sale.
 
-Firstly, let's create a function that initializes the Marketplace module in our code.
+To do that, we'll use another hook, called `useMarketplace`.
 
-Create a folder called `lib` and within that folder, create a file called `initMarketplace.ts`
+We'll call `getAllListings` from the marketplace, store them in state when they're ready, and display it to our users.
 
-Here's the code to initialize the marketplace module:
-
-```
-// lib/initMarketplace.ts
-import { ThirdwebSDK } from "@thirdweb-dev/sdk";
-import { Web3Provider } from "@ethersproject/providers";
-
-/**
- * This is how we initialize the marketplace SDK.
- * If a provider is passed in that is not undefined, it allows us to perform write operations for the current user.
- * If the provider is undefined, it will use a public RPC connection, which only enables read operations.
- */
-export default function initMarketplace(provider: Web3Provider | undefined) {
-  const sdk = new ThirdwebSDK(
-    provider === undefined
-      ? // Put your RPC URL here (or use this public one (not recommended)):
-        // This is a public read-only access to the marketplace contract.
-        "https://rinkeby.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161"
-      : // If a provider is provided, use it to gain write-access on behalf of the user.
-        provider.getSigner()
-  );
-
-  const marketplaceContract = sdk.getMarketplace(
-    // Your marketplace contract address here
-    "0x926aC8963419Bd4811640Ae8124e0e9b2734cb45"
-  );
-
-  return marketplaceContract;
-}
-
-```
-
-This is a simple function to kick-start the thirdweb SDK, and grab our marketplace via it's contract address. If you're not sure where to find that address, you can grab it here:
-
-![image.png](https://cdn.hashnode.com/res/hashnode/image/upload/v1646709715798/-
-LyvxH5vr.png)
-
-You might notice that we are accepting a parameter called `provider`, that is either `undefined` or of type `Web3Provider`.
-
-Whenever we call this `initMarketplace` function, we will pass in a provider, that we grab from a hook called `useWeb3`.
-
-If a user has connected their wallet, this `provider` will be passed in, meaning we are initializing the Thirdweb SDK on behalf of the user. This allows the current user (wallet) to communicate to the blockchain, for example we can call `buy` or `bid` for the user's wallet this way.
-
-If the user hasn't connected their wallet, `provider` will be `undefined`, and we use a public RPC to initialize the marketplace with **read-only** access.
-
-Back in `index.tsx`, let's replace our existing code with logic to fetch all of the listings from the marketplace.
-
-Firstly, let's fetch the listings with some clean usage of react hooks:
+Here's how that looks in code:
 
 **Grabbing all listings via the marketplace.getAllListings method**
 
 ```ts
+import type { NextPage } from "next";
+import styles from "../styles/Home.module.css";
+import { useEffect, useState } from "react";
+import { AuctionListing, DirectListing } from "@thirdweb-dev/sdk";
+import Link from "next/link";
+import { useMarketplace } from "@thirdweb-dev/react";
+import { ConnectWallet } from "../components/ConnectWallet";
+
 const Home: NextPage = () => {
   // Loading flag to show a loading  state while we fetch the listings
   const [loadingListings, setLoadingListings] = useState<boolean>(true);
@@ -258,34 +220,29 @@ const Home: NextPage = () => {
     []
   );
 
-  // We'll talk more about this provider later.
-  const { provider } = useWeb3();
-
-  // Call the initMarketplace function to initialize the marketplace
-  const marketplace = useMemo(() => {
-    return initMarketplace(provider);
-    // Whenever provider changes (i.e. user connects or disconnects wallet)
-    // this gets re-run, to update the marketplace accordingly.
-    // For example, if the user signs in, the marketplace will change to be
-    // on behalf of the user, enabling write-access.
-  }, [provider]);
+  // Connect your marketplace smart contract here (replace this address)
+  const marketplace = useMarketplace(
+    "0x0000000000000000000000000000"
+  );
 
   useEffect(() => {
-    // This is called an IIFE, meaning it "runs itself" immediately.
-    // We do this because we need an async scope,
-    // in order for us to await the listings to come back from the request.
     (async () => {
-      // Get all listings from the marketplace and update the state variable
-      setListings(await marketplace.getAllListings());
-      // Set loading to false when the listings are ready
-      setLoadingListings(false);
+      if (marketplace) {
+        // Get all listings from the marketplace
+        setListings(await marketplace.getAllListings());
+
+        // Set loading to false when the listings are ready
+        setLoadingListings(false);
+      }
     })();
   }, [marketplace]);
 
- return (
+  return (
     // ...
- )
-}
+  );
+};
+
+export default Home;
 ```
 
 Cool, now we are loading all of the listings, let show them in the UI:
@@ -366,7 +323,7 @@ export default Home;
 
 Now we are done with the home page, lets create some listings to display!
 
-In this guide, we'll quickly go through the process of creating an NFT Collection Module too, so that we can play around with some NFTs on the marketplace!
+In this guide, we'll quickly go through the process of creating an NFT Collection smart contract, so that we can play around with some NFTs on the marketplace!
 
 If you already have NFTs that you can play around with on the Rinkeby network, feel free to use those instead and skip this optional step.
 
@@ -402,13 +359,11 @@ There's a few bits of code to unpack here that we'll go through step by step.
 
 Firstly, let's import all of the stuff we'll need to use on this page:
 
-```
-import { useWeb3 } from "@3rdweb/hooks";
+```ts
+import { useMarketplace } from "@thirdweb-dev/react";
 import { NATIVE_TOKEN_ADDRESS, TransactionResult } from "@thirdweb-dev/sdk";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
-import { useMemo } from "react";
-import initMarketplace from "../lib/initMarketplace";
 import styles from "../styles/Create.module.css";
 ```
 
@@ -419,11 +374,11 @@ Before we dive into the code for that, it's important to know that there are two
 1. Auction Listings
 2. Direct Listings
 
-**Auction Listings**: are listings that have a set time period that users can bid. At the end of the auction, the auction will end, and the winning bid will win the auction.
+**Auction Listings** are listings that have a set time period that users can bid. At the end of the time period, the auction will end, and the winning bid will win the auction.
 
-**Direct Listings**: are listings that only finish if the seller decides to accept an offer, or if somebody pays the full price of the listing.
+**Direct Listings** are listings that only finish if the seller decides to accept an offer, or if somebody pays the full price of the listing.
 
-Both listing types allow potential buyers to place bids or buyout the listing by paying the asking price.
+Both listing types allow potential buyers to place bids or buyout the listing by paying the full asking price (AKA Buyout Price).
 
 Alright, with that background information, lets create some functions to list an item onto the marketplace, plus a little extra within the `create.tsx` page.
 
@@ -436,17 +391,14 @@ const Create: NextPage = () => {
   // Next JS Router hook to redirect to other pages
   const router = useRouter();
 
-  // A provider is used to "talk" to the blockchain. We use it to enable the user to perform write operations to the blockchain.
-  const { provider } = useWeb3();
+  // Connect to our marketplace contract via the useMarketplace hook
+  const marketplace = useMarketplace(
+    "0x90AC8dFF76C1692dD494e261dac5D0f6684B0674"
+  );
 
-  // Call the initMarketplace function to initialize the marketplace
-  const marketplace = useMemo(() => {
-    const m = initMarketplace(provider);
-    return m;
+export default Create;
 
-    // Whenever provider changes (e.g. user connects wallet), re-initialize the marketplace.
-  }, [provider]);
-};
+
 ```
 
 **Function that gets run when the form is submitted**
@@ -463,13 +415,10 @@ async function handleCreateListing(e) {
     // Prevent page from refreshing
     e.preventDefault();
 
-    // Store the result of the transaction attempt.
-    // if it's undefined = transaction failed
-    // if either the direct listing or auction listing is created
-    // we will store the result in this variable.
+    // Store the result of either the direct listing creation or the auction listing creation
     let transactionResult: undefined | TransactionResult = undefined;
 
-    // De-construct fields from form submission
+    // De-construct data from form submission
     const { listingType, contractAddress, tokenId, price } = e.target.elements;
 
     // Depending on the type of listing selected, call the appropriate function
@@ -510,14 +459,14 @@ async function createAuctionListing(
   price: string
 ) {
   try {
-    const transaction = await marketplace.auction.createListing({
+    const transaction = await marketplace?.auction.createListing({
       assetContractAddress: contractAddress, // Contract Address of the NFT
       buyoutPricePerToken: price, // Maximum price, the auction will end immediately if a user pays this price.
       currencyContractAddress: NATIVE_TOKEN_ADDRESS, // NATIVE_TOKEN_ADDRESS is the crpyto curency that is native to the network. i.e. Rinkeby ETH.
       listingDurationInSeconds: 60 * 60 * 24 * 7, // When the auction will be closed and no longer accept bids (1 Week)
       quantity: 1, // How many of the NFTs are being listed (useful for ERC 1155 tokens)
       reservePricePerToken: 0, // Minimum price, users cannot bid below this amount
-      startTimeInSeconds: Math.floor(Date.now() / 1000), // Start time of the auction (now)
+      startTimeInSeconds: 0, // Start time of the auction (now)
       tokenId: tokenId, // Token ID of the NFT.
     });
 
@@ -537,14 +486,13 @@ async function createDirectListing(
   price: string
 ) {
   try {
-    const transaction = await marketplace.direct.createListing({
+    const transaction = await marketplace?.direct.createListing({
       assetContractAddress: contractAddress, // Contract Address of the NFT
-      buyoutPricePerToken: price, // Asking price, users can buy the NFT for this price.
+      buyoutPricePerToken: price, // Maximum price, the auction will end immediately if a user pays this price.
       currencyContractAddress: NATIVE_TOKEN_ADDRESS, // NATIVE_TOKEN_ADDRESS is the crpyto curency that is native to the network. i.e. Rinkeby ETH.
       listingDurationInSeconds: 60 * 60 * 24 * 7, // When the auction will be closed and no longer accept bids (1 Week)
       quantity: 1, // How many of the NFTs are being listed (useful for ERC 1155 tokens)
-      // reservePricePerToken: 0, : Direct Listings have no reserve price
-      startTimeInSeconds: Math.floor(Date.now() / 1000), // Start time of the auction (now)
+      startTimeInSeconds: 0, // Start time of the auction (now)
       tokenId: tokenId, // Token ID of the NFT.
     });
 
@@ -558,7 +506,7 @@ async function createDirectListing(
 **Render a form where users can write the NFT info**
 
 ```ts
-return (
+  return (
     <div className={styles.container}>
       <form onSubmit={(e) => handleCreateListing(e)} className={styles.form}>
         <h1 className={styles.heading}>Create Listing</h1>
@@ -647,15 +595,11 @@ export default Create;
 }
 
 .field {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
   width: 100%;
-  max-width: 500px;
-  margin: 0 auto;
-  border: 1px solid grey;
-  border-radius: 8px;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }
 
 .submit {
@@ -683,7 +627,7 @@ Now, let's go ahead and list our NFT that we created inside our NFT Collection.
 
 First, let's copy the NFT's contract address via the thirdweb dashboard and also note it's tokenId (which should be `0` assuming its the first one you made in the collection).
 
-Sweet, let's fill out our form with the NFT information, like so:
+Sweet! Let's fill out our form with the NFT information, like so:
 
 ![image.png](https://cdn.hashnode.com/res/hashnode/image/upload/v1646720063106/PcdFevw_R.png)
 
@@ -719,12 +663,11 @@ The way that dynamic routes work in Next.JS is that you create a folder inside t
 Now, whenever a user visits the route `/listing/<listing id here>`, we show them the appropriate listing page, by performing some logic inside this component to fetch the listing by it's `id`. Let's see how that looks in code.
 
 ```ts
-import { useWeb3 } from "@3rdweb/hooks";
+import { useMarketplace } from "@thirdweb-dev/react";
 import { AuctionListing, DirectListing } from "@thirdweb-dev/sdk";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import initMarketplace from "../../lib/initMarketplace";
 import styles from "../../styles/Listing.module.css";
 
 const ListingPage: NextPage = () => {
@@ -761,10 +704,10 @@ const [listing, setListing] = useState<
   undefined | DirectListing | AuctionListing
 >(undefined);
 
-const marketplace = useMemo(() => {
-  // Initialize the marketplace with the provider.
-  return initMarketplace(provider);
-}, [provider]);
+// Initialize the marketplace contract
+const marketplace = useMarketplace(
+  "0x90AC8dFF76C1692dD494e261dac5D0f6684B0674"
+);
 
 // When the component mounts, ask the marketplace for the listing with the given listingId
 // Using the listingid from the URL (via router.query)
@@ -929,7 +872,7 @@ async function createBidOrOffer() {
   try {
     // If the listing type is a direct listing, then we can create an offer.
     if (listing?.type === 0) {
-      await marketplace.direct.makeOffer(
+      await marketplace?.direct.makeOffer(
         listingId, // The listingId of the listing we want to make an offer for
         1, // Quantity = 1
         "0xc778417E063141139Fce010982780140Aa0cD5Ab", // WETH address on Rinkeby network
@@ -939,7 +882,7 @@ async function createBidOrOffer() {
 
     // If the listing type is an auction listing, then we can create a bid.
     if (listing?.type === 1) {
-      await marketplace.auction.makeBid(listingId, bidAmount);
+      await marketplace?.auction.makeBid(listingId, bidAmount);
     }
   } catch (error) {
     console.error(error);
@@ -949,14 +892,15 @@ async function createBidOrOffer() {
 
 **Buying the NFT**
 
-```
-  async function buyNft() {
-    try {
-      await marketplace.buyoutListing(listingId, 1);
-    } catch (error) {
-      console.error(error);
-    }
+```ts
+async function buyNft() {
+  try {
+    // Simple one-liner for buying the NFT
+    await marketplace?.buyoutListing(listingId, 1);
+  } catch (error) {
+    console.error(error);
   }
+}
 ```
 
 Now let's attach these functions to their respective buttons that we created:

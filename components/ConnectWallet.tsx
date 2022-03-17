@@ -1,10 +1,9 @@
 import { useAddress, useMetamask } from "@thirdweb-dev/react";
 
 export const ConnectWallet = () => {
-  // get a function to connect to a particular wallet
-  // options: useMetamask() - useCoinbase() - useWalletConnect()
+  // A hook to enable users to connect with MetaMask
   const connectWithMetamask = useMetamask();
-  // once connected, you can get the connected wallet information from anywhere (address, signer)
+  // Once connected, you can get the connected wallet information from anywhere (address, signer)
   const address = useAddress();
   return (
     <div>
