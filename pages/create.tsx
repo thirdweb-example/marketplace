@@ -14,7 +14,7 @@ const Create: NextPage = () => {
   );
 
   // This function gets called when the form is submitted.
-  async function handleCreateListing(e) {
+  async function handleCreateListing(e: any) {
     try {
       // Prevent page from refreshing
       e.preventDefault();
