@@ -7,30 +7,29 @@ import { useMarketplace } from "@thirdweb-dev/react";
 import { ConnectWallet } from "../components/ConnectWallet";
 
 const Home: NextPage = () => {
+  // Loading flag to show a loading  state while we fetch the listings
   const [loadingListings, setLoadingListings] = useState<boolean>(true);
+  // Here we'll store an array of listings once they come back from our request.
   const [listings, setListings] = useState<(AuctionListing | DirectListing)[]>(
     []
   );
 
+  // Connect your marketplace smart contract here (replace this address)
   const marketplace = useMarketplace(
-    "0x90AC8dFF76C1692dD494e261dac5D0f6684B0674"
+    "0xd506F4e7250DCb05A4826d2518C53b14FbA8E8F8"
   );
-
-  console.log(marketplace);
 
   useEffect(() => {
     (async () => {
       if (marketplace) {
         // Get all listings from the marketplace
-        setListings(await marketplace.getAllListings());
+        setListings(await marketplace?.getActiveListings());
 
         // Set loading to false when the listings are ready
         setLoadingListings(false);
       }
     })();
-  }, [marketplace]);
-
-  console.log(listings);
+  }, [marketplace?.getActiveListings]);
 
   return (
     <div className={styles.container}>

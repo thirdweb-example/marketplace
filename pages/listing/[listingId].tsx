@@ -18,7 +18,7 @@ const ListingPage: NextPage = () => {
   // Loading flag for the UI, so we can show a loading state while we wait for the data to load.
   const [loadingListing, setLoadingListing] = useState<boolean>(true);
 
-  // Store the bid amount the user entered
+  // Store the bid amount the user entered into the bidding textbox
   const [bidAmount, setBidAmount] = useState<string>("");
 
   // Storing this listing in a state variable so we can use it in the UI once it's fetched.
@@ -26,8 +26,9 @@ const ListingPage: NextPage = () => {
     undefined | DirectListing | AuctionListing
   >(undefined);
 
+  // Initialize the marketplace contract
   const marketplace = useMarketplace(
-    "0x90AC8dFF76C1692dD494e261dac5D0f6684B0674"
+    "0x0000000000000000000000000000" // Your address here
   );
 
   // When the component mounts, ask the marketplace for the listing with the given listingId
@@ -46,15 +47,21 @@ const ListingPage: NextPage = () => {
     })();
   }, [listingId, marketplace]);
 
+  if (loadingListing) {
+    return <div>Loading...</div>;
+  }
+
+  if (!listing) {
+    return <div>Listing not found</div>;
+  }
+
   async function createBidOrOffer() {
     try {
       // If the listing type is a direct listing, then we can create an offer.
       if (listing?.type === 0) {
-        console.log("Making offer");
         await marketplace?.direct.makeOffer(
           listingId, // The listingId of the listing we want to make an offer for
           1, // Quantity = 1
-          // https://rinkeby.etherscan.io/token/0xc778417E063141139Fce010982780140Aa0cD5Ab?a=0x5069de7e4ee28b6b17e8a8d1fe699277f5db98cd
           "0xc778417E063141139Fce010982780140Aa0cD5Ab", // WETH address on Rinkeby network
           bidAmount // The offer amount the user entered
         );
@@ -62,7 +69,6 @@ const ListingPage: NextPage = () => {
 
       // If the listing type is an auction listing, then we can create a bid.
       if (listing?.type === 1) {
-        console.log("Making bid");
         await marketplace?.auction.makeBid(listingId, bidAmount);
       }
     } catch (error) {
@@ -72,31 +78,11 @@ const ListingPage: NextPage = () => {
 
   async function buyNft() {
     try {
-      // Simple one-liner for buying the NFT =)
+      // Simple one-liner for buying the NFT
       await marketplace?.buyoutListing(listingId, 1);
     } catch (error) {
       console.error(error);
     }
-  }
-
-  // Get top bid
-  // (async function topBid() {
-  //   try {
-  //     if (listingId) {
-  //       const bid = await marketplace?.auction.getWinningBid(listingId);
-  //       console.log(bid);
-  //     }
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  //   })();
-
-  if (loadingListing) {
-    return <div>Loading...</div>;
-  }
-
-  if (!listing) {
-    return <div>Listing not found</div>;
   }
 
   return (
@@ -118,8 +104,6 @@ const ListingPage: NextPage = () => {
         <b>Buyout Price</b> {listing.buyoutCurrencyValuePerToken.displayValue}{" "}
         {listing.buyoutCurrencyValuePerToken.symbol}
       </p>
-
-      <p className={styles.text}></p>
 
       <div className={styles.buttonsContainer}>
         <div>

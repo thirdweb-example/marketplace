@@ -222,7 +222,7 @@ const Home: NextPage = () => {
 
   // Connect your marketplace smart contract here (replace this address)
   const marketplace = useMarketplace(
-    "0x0000000000000000000000000000"
+    "0x0000000000000000000000000000" // Your address here
   );
 
   useEffect(() => {
