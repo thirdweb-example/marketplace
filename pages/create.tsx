@@ -10,7 +10,7 @@ const Create: NextPage = () => {
 
   // Connect to our marketplace contract via the useMarketplace hook
   const marketplace = useMarketplace(
-    "0x0000000000000000000000000000" // Your address here
+    "0x00Ae2A1b5E6dd2C69F7E9F08c777b74fe46b1ea6" // Your address here
   );
 
   // This function gets called when the form is submitted.
@@ -67,7 +67,7 @@ const Create: NextPage = () => {
         listingDurationInSeconds: 60 * 60 * 24 * 7, // When the auction will be closed and no longer accept bids (1 Week)
         quantity: 1, // How many of the NFTs are being listed (useful for ERC 1155 tokens)
         reservePricePerToken: 0, // Minimum price, users cannot bid below this amount
-        startTimeInSeconds: 0, // Start time of the auction (now)
+        startTimestamp: new Date(), // When the listing will start
         tokenId: tokenId, // Token ID of the NFT.
       });
 
@@ -89,7 +89,7 @@ const Create: NextPage = () => {
         currencyContractAddress: NATIVE_TOKEN_ADDRESS, // NATIVE_TOKEN_ADDRESS is the crpyto curency that is native to the network. i.e. Rinkeby ETH.
         listingDurationInSeconds: 60 * 60 * 24 * 7, // When the auction will be closed and no longer accept bids (1 Week)
         quantity: 1, // How many of the NFTs are being listed (useful for ERC 1155 tokens)
-        startTimeInSeconds: 0, // Start time of the auction (now)
+        startTimestamp: new Date(0), // When the listing will start
         tokenId: tokenId, // Token ID of the NFT.
       });
 
