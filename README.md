@@ -1,32 +1,60 @@
+# Marketplace With Next.JS
+
 ## Introduction
 
-In this guide, you will learn how to create a marketplace like [OpenSea](https://opensea.io/) on the Ethereum network!
+In this guide, you will learn how to create a marketplace like [OpenSea](https://opensea.io/) on the Ethereum test network!
 
 We'll implement the following features:
 
-- Create a marketplace where we can sell our NFTs!
+- A marketplace where we can sell our NFTs!
 - List NFTs for **direct sale** or for **auction** onto the marketplace.
 - Allow users to **make bids** and **buy** our NFTs.
 
-Let's do this!
+## Tools
 
-If you get stuck or confused at any point, you can always grab the source code from here this repo:
+- [**thirdweb Marketplace**](https://portal.thirdweb.com/contracts/marketplace): to facilitate the listing of NFTs and enabling users to offer, buy, and sell NFTs on the marketplace.
+- [**thirdweb NFT Collection**](https://portal.thirdweb.com/contracts/nft-collection): to create an ERC721 NFT Collection that we can list onto the marketplace.
+- [**thirdweb React SDK**](https://docs.thirdweb.com/react): to enable users to connect and disconnect their wallets with our website, and prompt them to approve transactions with MetaMask.
+- [**thirdweb TypeScript SDK**](https://docs.thirdweb.com/typescript): to connect to our NFT Collection Smart contract via TypeScript & React hooks, mint new NFTs, create new listings, and view all of the listings for sale!
+- [**Next JS Dynamic Routes**](https://nextjs.org/docs/routing/dynamic-routes): so we can have a dynamic route for each listing. eg. `listing/1` will show listing 1.
 
-%[https://github.com/jarrodwatts/thirdweb-nft-marketplace]
+## Using This Repo
 
-### Pre-requisites
+- Click on the **Use this template** button to create your own copy of this repo:
 
-You'll want to make sure you have the following, before we get started:
+![use this template.png](https://cdn.hashnode.com/res/hashnode/image/upload/v1651048077489/WeMVOeg6W.png)
 
-- A MetaMask wallet or another web wallet installed.
-- Some Rinkeby Testnet ETH (You can get ETH on the Rinkeby Testnet [here](https://rinkebyfaucet.com/)).
-- Some basic JavaScript knowledge.
+- Create your own Marketplace contract via the thirdweb dashboard. (follow the steps in the guide below if you need extra help here)
 
-### Marketplace Module
+- Replace any instances of our marketplace contract (`0x00Ae2A1b5E6dd2C69F7E9F08c777b74fe46b1ea6`) with your own contract address.
 
-To create a marketplace module:
+- Install the required dependencies:
 
-- Head to the [thirdweb dashboard](https://nightly.thirdweb.com/dashboard).
+```bash
+npm install
+# or
+yarn install
+```
+
+- Run the development server:
+
+```bash
+npm run dev
+# or
+yarn dev
+```
+
+- Visit http://localhost:3000/ to view the demo.
+
+Need More help? Want to understand the code a bit more? Want to set the project up yourself? Follow the guide below! 👇
+
+---
+
+## Creating A Marketplace
+
+To create a marketplace contract:
+
+- Head to the [thirdweb dashboard](https://thirdweb.com/dashboard).
 - Click **Create a new contract**.
 - Click **Setup Marketplace**.
 
@@ -36,7 +64,7 @@ Here, you can define the configuration of your marketplace contract, including t
 
 When you're ready, click **Deploy Now** ([you'll need some Testnet ETH for this](https://rinkebyfaucet.com/)).
 
-Behind the scenes, you're actually deploying your very open smart contract. By the way, did we mention those are open source? You can check them out [here](https://github.com/thirdweb-dev/contracts/tree/main/contracts).
+Behind the scenes, you're actually deploying your very own smart contract. By the way, did we mention those are open source? You can check them out [here](https://github.com/thirdweb-dev/contracts/tree/main/contracts).
 
 Once it has successfully deployed, it should look like this:
 
@@ -52,9 +80,7 @@ There are a few conditions that need to be met in order for someone to list an N
 
 - They must **own **the NFT they're trying to list.
 - They must have **permission** to list onto the marketplace (you control this).
-- They also need a little bit of ETH to cover the **gas fees** of interacting with our contract.
-
-If you're curious about how the marketplace smart contract works, you can see the source code for that [here](https://github.com/thirdweb-dev/contracts/blob/main/contracts/marketplace/Marketplace.sol).
+- They also need a little bit of ETH to cover the **gas fees** of interacting with the contract.
 
 Alright, enough talking! Let's write some code!
 
@@ -62,13 +88,13 @@ Alright, enough talking! Let's write some code!
 
 To create your marketplace project, lets head to the command line and run:
 
-```
+```bash
 npx create-next-app@latest --ts my-marketplace
 ```
 
 Next, (no pun intended), change directory into your newly created Next App.
 
-```
+```bash
 cd .\my-marketplace\
 ```
 
@@ -78,13 +104,13 @@ Thirdweb comes jam-packed with features and libraries that help you build in the
 
 Let's install them by running:
 
-```
+```bash
 npm install @thirdweb-dev/react @thirdweb-dev/sdk ethers
 ```
 
 Cool! Now, lets jump into the code by running:
 
-```
+```bash
 code .
 ```
 
@@ -92,13 +118,13 @@ This will open your project up in **Visual Studio Code**. Cool little trick righ
 
 To get your local environment setup, run:
 
-```
+```bash
 npm run dev
 ```
 
 And visit http://localhost:3000/
 
-### Add the Thirdweb Provider To Your App
+## Add the Thirdweb Provider To Your App
 
 Whenever you work with the blockchain and interact with tokens or contracts on a website, you need to use a web wallet. The thirdweb React provider makes it straightforward to let your users connect their wallets to your website, and it abstracts away all the boilerplate you would usually have to write.
 
@@ -126,7 +152,7 @@ export default MyApp;
 
 If you are curious about the ThirdwebProvider and how its magic works behind the scenes, [we have another great tutorial here](https://portal.thirdweb.com/guides/add-connectwallet-to-your-website) that goes into more depth.
 
-### Signing Users In With Their Wallets
+## Signing Users In With Their Wallets
 
 The first thing we'll want users to do is to sign in with their wallets.
 
@@ -134,7 +160,7 @@ For this application, we'll ask users to connect their wallets on the homepage.
 
 Let's create a component that enables user's to connect with [Metamask](https://metamask.io/).
 
-Create a new folder called `components`, and a file called `CreateWallet.tsx` within our new folder.
+Create a new folder called `components`, and a file called `ConnectWallet.tsx` within our new folder.
 
 Here's the code for our user's to connect their wallets:
 
@@ -183,25 +209,17 @@ Now you have a button that connects users to the correct network, and displays t
 
 That's a basic homepage already. It doesn't let a user do much besides connecting their wallet, but it's a good base for any other project you might have in mind. Before we continue, we need to have another word, though.
 
-**IMPORTANT**
-
-_Usually, you would have to do a little more than only let your users connect their wallets. Whenever your users make API calls, it is better to first verify that they really own a specific wallet and are who they state they are._
-
-_Unfortunately, implementing the whole logic to sign in users takes a little more time than we have here. You can, however, follow [our guide](https://portal.thirdweb.com/guides/sign-in-with-ethereum-using-thirdweb-connectwallet) on letting your users sign in with their wallet to also implement this logic._
-
-_For now, we will just assume that everything we do is safe._
-
-### Displaying Listings On The Marketplace
+## Displaying Listings On The Marketplace
 
 Now we can sign users in, let's show them what we have for sale.
 
 To do that, we'll use another hook, called `useMarketplace`.
 
-We'll call `getAllListings` from the marketplace, store them in state when they're ready, and display it to our users.
+We'll call `getActiveListings` from the marketplace, which grabs all of the listings on the smart contract that haven't expired or already sold. We'll go ahead and store them in state when they're ready, and display it to our users.
 
 Here's how that looks in code:
 
-**Grabbing all listings via the marketplace.getAllListings method**
+### Grabbing all listings via the marketplace.getAllListings method\*\*
 
 ```ts
 import type { NextPage } from "next";
@@ -229,23 +247,21 @@ const Home: NextPage = () => {
     (async () => {
       if (marketplace) {
         // Get all listings from the marketplace
-        setListings(await marketplace.getAllListings());
+        setListings(await marketplace?.getActiveListings());
 
         // Set loading to false when the listings are ready
         setLoadingListings(false);
       }
     })();
-  }, [marketplace]);
+  }, [marketplace?.getActiveListings]);
 
-  return (
-    // ...
-  );
+  return <div></div>;
 };
 
 export default Home;
 ```
 
-Cool, now we are loading all of the listings, let show them in the UI:
+Cool, now that we have all of the active listings, let show them in the UI:
 
 **Displaying listings:**
 
@@ -323,13 +339,13 @@ export default Home;
 
 Now we are done with the home page, lets create some listings to display!
 
-In this guide, we'll quickly go through the process of creating an NFT Collection smart contract, so that we can play around with some NFTs on the marketplace!
+In this guide, we'll also quickly go through the process of creating an NFT Collection, so that we can play around with some NFTs on the marketplace!
 
 If you already have NFTs that you can play around with on the Rinkeby network, feel free to use those instead and skip this optional step.
 
-### (Optional) Creating An NFT Module
+## (Optional) Creating An NFT Module
 
-Head back to the [dashboard](https://nightly.thirdweb.com/dashboard) and create a new contract.
+Head back to the [dashboard](https://thirdweb.com/dashboard) and create a new contract.
 
 To create an NFT Collection, go to **Create NFTs and Tokens** > **NFT Collection**
 
@@ -351,7 +367,7 @@ Here's how it should look:
 
 Great work, now let's head back to the marketplace guide.
 
-### Listing Items on the marketplace
+## Listing Items on the marketplace
 
 Head back to your code and create a page in the `pages` folder called `create.tsx`.
 
@@ -374,9 +390,9 @@ Before we dive into the code for that, it's important to know that there are two
 1. Auction Listings
 2. Direct Listings
 
-**Auction Listings** are listings that have a set time period that users can bid. At the end of the time period, the auction will end, and the winning bid will win the auction.
+**Auction Listings**: listings that have a set time period that users can bid. At the end of the time period, the auction will end, and the winning bid will win the auction.
 
-**Direct Listings** are listings that only finish if the seller decides to accept an offer, or if somebody pays the full price of the listing.
+**Direct Listings**: listings that only finish if the seller decides to accept an offer, or if somebody pays the full price of the listing.
 
 Both listing types allow potential buyers to place bids or buyout the listing by paying the full asking price (AKA Buyout Price).
 
@@ -393,12 +409,13 @@ const Create: NextPage = () => {
 
   // Connect to our marketplace contract via the useMarketplace hook
   const marketplace = useMarketplace(
-    "0x90AC8dFF76C1692dD494e261dac5D0f6684B0674"
+    "0x0000000000000000000000000000" // Your address here
   );
 
+  return <div></div>;
+};
+
 export default Create;
-
-
 ```
 
 **Function that gets run when the form is submitted**
@@ -466,7 +483,7 @@ async function createAuctionListing(
       listingDurationInSeconds: 60 * 60 * 24 * 7, // When the auction will be closed and no longer accept bids (1 Week)
       quantity: 1, // How many of the NFTs are being listed (useful for ERC 1155 tokens)
       reservePricePerToken: 0, // Minimum price, users cannot bid below this amount
-      startTimeInSeconds: 0, // Start time of the auction (now)
+      startTimestamp: new Date(), // When the listing will start (now)
       tokenId: tokenId, // Token ID of the NFT.
     });
 
@@ -492,7 +509,7 @@ async function createDirectListing(
       currencyContractAddress: NATIVE_TOKEN_ADDRESS, // NATIVE_TOKEN_ADDRESS is the crpyto curency that is native to the network. i.e. Rinkeby ETH.
       listingDurationInSeconds: 60 * 60 * 24 * 7, // When the auction will be closed and no longer accept bids (1 Week)
       quantity: 1, // How many of the NFTs are being listed (useful for ERC 1155 tokens)
-      startTimeInSeconds: 0, // Start time of the auction (now)
+      startTimestamp: new Date(0), // When the listing will start (now)
       tokenId: tokenId, // Token ID of the NFT.
     });
 
@@ -503,7 +520,7 @@ async function createDirectListing(
 }
 ```
 
-**Render a form where users can write the NFT info**
+**Render a form where users can write the NFT they want to list into**
 
 ```ts
   return (
@@ -937,7 +954,7 @@ To test that it works as you expect, feel free to create a new wallet, so that y
 
 As we mentioned briefly, in order to make bids, we'll need some Rinkeby wETH, which is the ERC20 token Wrapped Ether.
 
-### Getting Wrapped ETH
+## Getting Wrapped ETH
 
 To add WETH to MetaMask, click the `Import tokens` button down the bottom.
 ![image.png](https://cdn.hashnode.com/res/hashnode/image/upload/v1646804883944/52c-N9meM.png)
@@ -962,7 +979,7 @@ Let's try it out, and click on our `Buy` button! This will pay the full price fo
 
 **Magic!**
 
-The wallet that bought the NFT now owns the token, the listing has been closed, and the funds have been transferred to the seller, (any fees you configured in thirdweb are waiting for you on your thirdweb dashboard! 😉).
+The wallet that bought the NFT now owns the token, the listing has been closed, and the funds have been transferred to the seller.
 
 If you check out the NFT Module you created (if you created one), you can see that it is now owned by the buyer in there!
 
@@ -977,3 +994,7 @@ In this guide, we've successfully:
 - Built a full-stack NFT marketplace project.
 - Created direct and auction listings with NFTs we minted.
 - Received bids and sold our NFTs via the marketplace!
+
+## Join our Discord!
+
+For any questions, suggestions, join our discord at [https://discord.gg/thirdweb](https://discord.gg/thirdweb).
