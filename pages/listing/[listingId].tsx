@@ -1,9 +1,9 @@
-import { useMarketplace } from "@thirdweb-dev/react";
+import { MediaRenderer, useMarketplace } from "@thirdweb-dev/react";
 import { AuctionListing, DirectListing, ListingType } from "@thirdweb-dev/sdk";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import styles from "../../styles/Listing.module.css";
+import styles from "../../styles/Home.module.css";
 
 const ListingPage: NextPage = () => {
   // Next JS Router hook to redirect to other pages and to grab the query from the URL (listingId)
@@ -12,7 +12,6 @@ const ListingPage: NextPage = () => {
   // De-construct listingId out of the router.query.
   // This means that if the user visits /listing/0 then the listingId will be 0.
   // If the user visits /listing/1 then the listingId will be 1.
-  // We do some weird TypeScript casting, because Next.JS thinks listingId can be an array for some reason.
   const { listingId } = router.query as { listingId: string };
 
   // Loading flag for the UI, so we can show a loading state while we wait for the data to load.
@@ -48,17 +47,18 @@ const ListingPage: NextPage = () => {
   }, [listingId, marketplace]);
 
   if (loadingListing) {
-    return <div>Loading...</div>;
+    return <div className={styles.loadingOrError}>Loading...</div>;
   }
 
   if (!listing) {
-    return <div>Listing not found</div>;
+    return <div className={styles.loadingOrError}>Listing not found</div>;
   }
 
   async function createBidOrOffer() {
+    console.log("createBidOrOffer", bidAmount, listingId);
     try {
       // If the listing type is a direct listing, then we can create an offer.
-      if (listing?.type === 0) {
+      if (listing?.type === ListingType.Direct) {
         await marketplace?.direct.makeOffer(
           listingId, // The listingId of the listing we want to make an offer for
           1, // Quantity = 1
@@ -68,9 +68,15 @@ const ListingPage: NextPage = () => {
       }
 
       // If the listing type is an auction listing, then we can create a bid.
-      if (listing?.type === 1) {
+      if (listing?.type === ListingType.Auction) {
         await marketplace?.auction.makeBid(listingId, bidAmount);
       }
+
+      alert(
+        `${
+          listing?.type === ListingType.Auction ? "Bid" : "Offer"
+        }created successfully!`
+      );
     } catch (error) {
       console.error(error);
     }
@@ -80,52 +86,83 @@ const ListingPage: NextPage = () => {
     try {
       // Simple one-liner for buying the NFT
       await marketplace?.buyoutListing(listingId, 1);
+      alert("NFT bought successfully!");
     } catch (error) {
       console.error(error);
     }
   }
 
   return (
-    <div className={styles.container}>
-      <img src={listing.asset.image} style={{ maxHeight: 400 }} />
-      <h1 className={styles.title}>{listing.asset.name}</h1>
-      <p className={styles.smallText}>
-        <b>Seller:</b> {listing.sellerAddress}
-      </p>
-      <p className={styles.text}>
-        <b>Description:</b> {listing.asset.description}
-      </p>
-
-      <p className={styles.text}>
-        <b>Listing Type:</b>{" "}
-        {listing.type === 0 ? "Direct Listing" : "Auction Listing"}
-      </p>
-
-      <p className={styles.text}>
-        <b>Buyout Price</b> {listing.buyoutCurrencyValuePerToken.displayValue}{" "}
-        {listing.buyoutCurrencyValuePerToken.symbol}
-      </p>
-
-      <div className={styles.buttonsContainer}>
-        <div>
-          <input
-            type="text"
-            placeholder="Enter bid amount"
-            value={bidAmount}
-            onChange={(e) => setBidAmount(e.target.value)}
-            className={styles.textField}
+    <div className={styles.container} style={{}}>
+      <div className={styles.listingContainer}>
+        <div className={styles.leftListing}>
+          <MediaRenderer
+            src={listing.asset.image}
+            className={styles.mainNftImage}
           />
+        </div>
 
-          <button
-            className={styles.bidButton}
-            onClick={() => createBidOrOffer()}
+        <div className={styles.rightListing}>
+          <h1>{listing.asset.name}</h1>
+          <p>
+            Owned by{" "}
+            <b>
+              {listing.sellerAddress?.slice(0, 6) +
+                "..." +
+                listing.sellerAddress?.slice(36, 40)}
+            </b>
+          </p>
+
+          <h2>
+            <b>{listing.buyoutCurrencyValuePerToken.displayValue}</b>{" "}
+            {listing.buyoutCurrencyValuePerToken.symbol}
+          </h2>
+
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              gap: 20,
+              alignItems: "center",
+            }}
           >
-            Make Bid
-          </button>
-
-          <button className={styles.buyButton} onClick={() => buyNft()}>
-            Buy Now
-          </button>
+            <button
+              style={{ borderStyle: "none" }}
+              className={styles.mainButton}
+              onClick={buyNft}
+            >
+              Buy
+            </button>
+            <p style={{ color: "grey" }}>|</p>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 8,
+              }}
+            >
+              <input
+                type="text"
+                name="bidAmount"
+                className={styles.textInput}
+                onChange={(e) => setBidAmount(e.target.value)}
+                placeholder="Amount"
+                style={{ marginTop: 0, marginLeft: 0, width: 128 }}
+              />
+              <button
+                className={styles.mainButton}
+                onClick={createBidOrOffer}
+                style={{
+                  borderStyle: "none",
+                  background: "transparent",
+                  width: "fit-content",
+                }}
+              >
+                Make Offer
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>

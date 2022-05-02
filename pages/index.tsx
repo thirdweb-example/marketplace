@@ -3,21 +3,11 @@ import styles from "../styles/Home.module.css";
 import { useEffect, useState } from "react";
 import { AuctionListing, DirectListing } from "@thirdweb-dev/sdk";
 import Link from "next/link";
-import {
-  MediaRenderer,
-  useAddress,
-  useDisconnect,
-  useMarketplace,
-  useMetamask,
-} from "@thirdweb-dev/react";
+import { MediaRenderer, useMarketplace } from "@thirdweb-dev/react";
 import { useRouter } from "next/router";
 
 const Home: NextPage = () => {
   const router = useRouter();
-  // Helpful thirdweb hooks to connect and manage the wallet from metamask.
-  const address = useAddress();
-  const connectWithMetamask = useMetamask();
-  const disconnectWallet = useDisconnect();
 
   // Loading flag to show a loading  state while we fetch the listings
   const [loadingListings, setLoadingListings] = useState<boolean>(true);
@@ -45,44 +35,6 @@ const Home: NextPage = () => {
 
   return (
     <>
-      {/* Header */}
-      <div className={styles.header}>
-        <div className={styles.left}>
-          <div>
-            <a
-              href="https://thirdweb.com/"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <img src={`/logo.png`} alt="Thirdweb Logo" width={135} />
-            </a>
-          </div>
-        </div>
-        <div className={styles.right}>
-          {address ? (
-            <>
-              <a
-                className={styles.secondaryButton}
-                onClick={() => disconnectWallet()}
-              >
-                Disconnect Wallet
-              </a>
-              <p style={{ marginLeft: 8, marginRight: 8, color: "grey" }}>|</p>
-              <p>
-                {address.slice(0, 6).concat("...").concat(address.slice(-4))}
-              </p>
-            </>
-          ) : (
-            <a
-              className={styles.mainButton}
-              onClick={() => connectWithMetamask()}
-            >
-              Connect Wallet
-            </a>
-          )}
-        </div>
-      </div>
-
       {/* Content */}
       <div className={styles.container}>
         {/* Top Section */}
@@ -121,60 +73,6 @@ const Home: NextPage = () => {
             ) : (
               // Otherwise, show the listings
               <div className={styles.listingGrid}>
-                {listings.map((listing) => (
-                  <div
-                    key={listing.id}
-                    className={styles.listingShortView}
-                    onClick={() => router.push(`/listing/${listing.id}`)}
-                  >
-                    <MediaRenderer
-                      src={listing.asset.image}
-                      style={{
-                        borderRadius: 16,
-                        // Fit the image to the container
-                        width: "100%",
-                        height: "100%",
-                      }}
-                    />
-                    <h2 className={styles.nameContainer}>
-                      <Link href={`/listing/${listing.id}`}>
-                        <a className={styles.name}>{listing.asset.name}</a>
-                      </Link>
-                    </h2>
-
-                    <p>
-                      <b>{listing.buyoutCurrencyValuePerToken.displayValue}</b>{" "}
-                      {listing.buyoutCurrencyValuePerToken.symbol}
-                    </p>
-                  </div>
-                ))}
-                {listings.map((listing) => (
-                  <div
-                    key={listing.id}
-                    className={styles.listingShortView}
-                    onClick={() => router.push(`/listing/${listing.id}`)}
-                  >
-                    <MediaRenderer
-                      src={listing.asset.image}
-                      style={{
-                        borderRadius: 16,
-                        // Fit the image to the container
-                        width: "100%",
-                        height: "100%",
-                      }}
-                    />
-                    <h2 className={styles.nameContainer}>
-                      <Link href={`/listing/${listing.id}`}>
-                        <a className={styles.name}>{listing.asset.name}</a>
-                      </Link>
-                    </h2>
-
-                    <p>
-                      <b>{listing.buyoutCurrencyValuePerToken.displayValue}</b>{" "}
-                      {listing.buyoutCurrencyValuePerToken.symbol}
-                    </p>
-                  </div>
-                ))}
                 {listings.map((listing) => (
                   <div
                     key={listing.id}

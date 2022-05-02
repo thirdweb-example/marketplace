@@ -5,20 +5,15 @@ import "../styles/globals.css";
 import Head from "next/head";
 import ThirdwebGuideFooter from "../components/ThirdwebGuideFooter";
 import ThirdwebGuideOverlay from "../components/ThirdwebGuideOverlay";
+import Header from "../components/Header";
 
 // This is the chainId your dApp will work on.
-const activeChainId = ChainId.Mumbai;
+const activeChainId = ChainId.Rinkeby;
 
 function MyApp({ Component, pageProps }: AppProps) {
   const [showGuideOverlay, setShowGuideOverlay] = React.useState(false);
   return (
-    <ThirdwebProvider
-      desiredChainId={activeChainId}
-      chainRpc={{
-        "80001":
-          "https://polygon-mumbai.g.alchemy.com/v2/ioUyv8HQHdNuHpL21sJDWMxB5tQaLCb2",
-      }}
-    >
+    <ThirdwebProvider desiredChainId={activeChainId}>
       <ThirdwebGuideOverlay
         show={showGuideOverlay}
         setShow={setShowGuideOverlay}
@@ -35,6 +30,7 @@ function MyApp({ Component, pageProps }: AppProps) {
           content="Thirdweb, Marketplace, NFT Marketplace Tutorial, NFT Auction Tutorial, How To Make OpenSea"
         />
       </Head>
+      <Header />
       <Component {...pageProps} />
       <ThirdwebGuideFooter onLearnMore={() => setShowGuideOverlay(true)} />
     </ThirdwebProvider>
