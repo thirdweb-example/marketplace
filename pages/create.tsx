@@ -1,16 +1,26 @@
-import { useMarketplace } from "@thirdweb-dev/react";
+import {
+  useAddress,
+  useDisconnect,
+  useMarketplace,
+  useMetamask,
+} from "@thirdweb-dev/react";
 import { NATIVE_TOKEN_ADDRESS, TransactionResult } from "@thirdweb-dev/sdk";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
-import styles from "../styles/Create.module.css";
+import styles from "../styles/Home.module.css";
 
 const Create: NextPage = () => {
+  // Helpful thirdweb hooks to connect and manage the wallet from metamask.
+  const address = useAddress();
+  const connectWithMetamask = useMetamask();
+  const disconnectWallet = useDisconnect();
+
   // Next JS Router hook to redirect to other pages
   const router = useRouter();
 
   // Connect to our marketplace contract via the useMarketplace hook
   const marketplace = useMarketplace(
-    "0x00Ae2A1b5E6dd2C69F7E9F08c777b74fe46b1ea6" // Your address here
+    process.env.NEXT_PUBLIC_MARKETPLACE_CONTRACT_ADDRESS // Your marketplace contract address here
   );
 
   // This function gets called when the form is submitted.
@@ -100,52 +110,120 @@ const Create: NextPage = () => {
   }
 
   return (
-    <div className={styles.container}>
-      <form onSubmit={(e) => handleCreateListing(e)} className={styles.form}>
-        <h1 className={styles.heading}>Create Listing</h1>
-
-        {/* Toggle between direct listing and auction listing */}
-        <div>
-          <input
-            type="radio"
-            name="listingType"
-            id="directListing"
-            value="directListing"
-            defaultChecked
-          />
-          <label htmlFor="directListing">Direct Listing</label>
-          <input
-            type="radio"
-            name="listingType"
-            id="auctionListing"
-            value="auctionListing"
-            style={{
-              marginLeft: 16,
-            }}
-          />
-          <label htmlFor="auctionListing">Auction Listing</label>
+    <>
+      {/* Header */}
+      <div className={styles.header}>
+        <div className={styles.left}>
+          <div>
+            <a
+              href="https://thirdweb.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <img src={`/logo.png`} alt="Thirdweb Logo" width={135} />
+            </a>
+          </div>
         </div>
+        <div className={styles.right}>
+          {address ? (
+            <>
+              <a
+                className={styles.secondaryButton}
+                onClick={() => disconnectWallet()}
+              >
+                Disconnect Wallet
+              </a>
+              <p style={{ marginLeft: 8, marginRight: 8, color: "grey" }}>|</p>
+              <p>
+                {address.slice(0, 6).concat("...").concat(address.slice(-4))}
+              </p>
+            </>
+          ) : (
+            <a
+              className={styles.mainButton}
+              onClick={() => connectWithMetamask()}
+            >
+              Connect Wallet
+            </a>
+          )}
+        </div>
+      </div>
 
-        <label className={styles.label}>
-          Contract Address
-          <input type="text" name="contractAddress" className={styles.field} />
-        </label>
+      {/* Content */}
+      <form onSubmit={(e) => handleCreateListing(e)}>
+        <div className={styles.container}>
+          {/* Form Section */}
+          <div className={styles.collectionContainer}>
+            <h1 className={styles.ourCollection}>
+              Upload your NFT to the marketplace:
+            </h1>
 
-        <label className={styles.label}>
-          Token ID
-          <input type="text" name="tokenId" className={styles.field} />
-        </label>
+            {/* Toggle between direct listing and auction listing */}
+            <div className={styles.listingTypeContainer}>
+              <input
+                type="radio"
+                name="listingType"
+                id="directListing"
+                value="directListing"
+                defaultChecked
+                className={styles.listingType}
+              />
+              <label
+                htmlFor="directListing"
+                className={styles.listingTypeLabel}
+              >
+                Direct Listing
+              </label>
+              <input
+                type="radio"
+                name="listingType"
+                id="auctionListing"
+                value="auctionListing"
+                className={styles.listingType}
+              />
+              <label
+                htmlFor="auctionListing"
+                className={styles.listingTypeLabel}
+              >
+                Auction Listing
+              </label>
+            </div>
 
-        <label className={styles.label}>
-          Price
-          <input type="text" name="price" className={styles.field} />
-        </label>
+            {/* NFT Contract Address Field */}
+            <input
+              type="text"
+              name="contractAddress"
+              className={styles.textInput}
+              placeholder="NFT Contract Address"
+            />
 
-        <button type="submit" className={styles.submit}>
-          Create Listing
-        </button>
+            {/* NFT Token ID Field */}
+            <input
+              type="text"
+              name="tokenId"
+              className={styles.textInput}
+              placeholder="NFT Token ID"
+            />
+
+            {/* Sale Price For Listing Field */}
+            <input
+              type="text"
+              name="price"
+              className={styles.textInput}
+              placeholder="Sale Price"
+            />
+
+            <button
+              type="submit"
+              className={styles.mainButton}
+              style={{ marginTop: 32, borderStyle: "none" }}
+            >
+              List NFT
+            </button>
+          </div>
+        </div>
       </form>
-    </div>
+    </>
   );
 };
 

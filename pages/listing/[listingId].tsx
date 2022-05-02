@@ -1,5 +1,5 @@
 import { useMarketplace } from "@thirdweb-dev/react";
-import { AuctionListing, DirectListing } from "@thirdweb-dev/sdk";
+import { AuctionListing, DirectListing, ListingType } from "@thirdweb-dev/sdk";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
@@ -28,7 +28,7 @@ const ListingPage: NextPage = () => {
 
   // Initialize the marketplace contract
   const marketplace = useMarketplace(
-    "0x00Ae2A1b5E6dd2C69F7E9F08c777b74fe46b1ea6" // Your address here
+    process.env.NEXT_PUBLIC_MARKETPLACE_CONTRACT_ADDRESS // Your marketplace contract address here
   );
 
   // When the component mounts, ask the marketplace for the listing with the given listingId
@@ -89,12 +89,13 @@ const ListingPage: NextPage = () => {
     <div className={styles.container}>
       <img src={listing.asset.image} style={{ maxHeight: 400 }} />
       <h1 className={styles.title}>{listing.asset.name}</h1>
+      <p className={styles.smallText}>
+        <b>Seller:</b> {listing.sellerAddress}
+      </p>
       <p className={styles.text}>
         <b>Description:</b> {listing.asset.description}
       </p>
-      <p className={styles.text}>
-        <b>Seller:</b> {listing.sellerAddress}
-      </p>
+
       <p className={styles.text}>
         <b>Listing Type:</b>{" "}
         {listing.type === 0 ? "Direct Listing" : "Auction Listing"}
@@ -121,11 +122,11 @@ const ListingPage: NextPage = () => {
           >
             Make Bid
           </button>
-        </div>
 
-        <button className={styles.buyButton} onClick={() => buyNft()}>
-          Buy Now
-        </button>
+          <button className={styles.buyButton} onClick={() => buyNft()}>
+            Buy Now
+          </button>
+        </div>
       </div>
     </div>
   );

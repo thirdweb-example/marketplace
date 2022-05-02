@@ -19,33 +19,66 @@
   margin-bottom: 1rem;
 }
 
+.smallText {
+  font-size: 1rem;
+  margin-bottom: 1rem;
+}
+
 .buttonsContainer {
   margin-top: 2rem;
   display: flex;
   flex-direction: row;
   justify-content: space-around;
+  align-items: center;
   margin-bottom: 1rem;
   gap: 1rem;
 }
 
 .bidButton {
-  border: 1px solid #0070f3;
-  border-radius: 5px;
-  padding: 0.5rem;
-  font-size: 1rem;
+  background-color: var(--white);
+  color: var(--tw-color1);
+  outline: none;
+  border: none;
+  height: 48px;
+  padding: 0 24px;
+  border-radius: 999px;
+  font-size: 1.25rem;
+  font-weight: 600;
+  cursor: pointer;
+
+  transition: background-color 300ms ease-in-out;
+  transform-origin: center;
+}
+
+.bidButton:hover {
+  background-color: var(--tw-white-hover);
 }
 
 .buyButton {
-  background-color: #0070f3;
-  border-radius: 5px;
-  padding: 0.5rem;
-  font-size: 1rem;
-  color: white;
+  background-color: var(--tw-color1);
+  outline: none;
+  border: none;
+  color: var(--white);
+  height: 48px;
+  padding: 0 24px;
+  border-radius: 999px;
+  font-size: 1.25rem;
+  font-weight: 600;
+  cursor: pointer;
+
+  transition: background-color 300ms ease-in-out;
+  transform-origin: center;
+}
+
+.buyButton:hover {
+  background-color: var(--tw-color1-hover);
 }
 
 .textField {
-  border: 1px solid #0070f3;
-  border-radius: 5px;
-  padding: 0.5rem;
-  font-size: 1rem;
+  height: 42px;
+  padding: 0 16px;
+  border-radius: 16px;
+  border: 1px solid var(--tw-color1);
+  font-weight: 600;
+  margin-top: 16px;
 }
