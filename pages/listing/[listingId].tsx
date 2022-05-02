@@ -55,7 +55,6 @@ const ListingPage: NextPage = () => {
   }
 
   async function createBidOrOffer() {
-    console.log("createBidOrOffer", bidAmount, listingId);
     try {
       // If the listing type is a direct listing, then we can create an offer.
       if (listing?.type === ListingType.Direct) {
@@ -75,7 +74,7 @@ const ListingPage: NextPage = () => {
       alert(
         `${
           listing?.type === ListingType.Auction ? "Bid" : "Offer"
-        }created successfully!`
+        } created successfully!`
       );
     } catch (error) {
       console.error(error);
