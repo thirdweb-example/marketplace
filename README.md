@@ -9,6 +9,8 @@ By the end, we'll implement the following features:
 - A marketplace where we can list NFTs for **direct sale** or for **auction**.
 - Allow users to **make bids** and **buy** our NFTs.
 
+**Check out the Demo here**: https://marketplace-next-ts.vercel.app/
+
 ## Tools
 
 - [**thirdweb Marketplace**](https://portal.thirdweb.com/contracts/marketplace): to facilitate the listing of NFTs and enable users to make buy, sell, or make offers on the NFTs on the marketplace.
