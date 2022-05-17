@@ -1,37 +1,23 @@
 import type { NextPage } from "next";
 import styles from "../styles/Home.module.css";
-import { useEffect, useState } from "react";
-import { AuctionListing, DirectListing } from "@thirdweb-dev/sdk";
 import Link from "next/link";
-import { MediaRenderer, useMarketplace } from "@thirdweb-dev/react";
+import {
+  MediaRenderer,
+  useActiveListings,
+  useMarketplace,
+} from "@thirdweb-dev/react";
 import { useRouter } from "next/router";
 
 const Home: NextPage = () => {
   const router = useRouter();
 
-  // Loading flag to show a loading  state while we fetch the listings
-  const [loadingListings, setLoadingListings] = useState<boolean>(true);
-  // Here we'll store an array of listings once they come back from our request.
-  const [listings, setListings] = useState<(AuctionListing | DirectListing)[]>(
-    []
-  );
-
   // Connect your marketplace smart contract here (replace this address)
   const marketplace = useMarketplace(
-    process.env.NEXT_PUBLIC_MARKETPLACE_CONTRACT_ADDRESS // Your marketplace contract address here
+    "0x277C0FB19FeD09c785448B8d3a80a78e7A9B8952" // Your marketplace contract address here
   );
 
-  useEffect(() => {
-    (async () => {
-      if (marketplace) {
-        // Get all listings from the marketplace
-        setListings(await marketplace?.getActiveListings());
-
-        // Set loading to false when the listings are ready
-        setLoadingListings(false);
-      }
-    })();
-  }, [marketplace?.getActiveListings]);
+  const { data: listings, isLoading: loadingListings } =
+    useActiveListings(marketplace);
 
   return (
     <>
@@ -73,7 +59,7 @@ const Home: NextPage = () => {
             ) : (
               // Otherwise, show the listings
               <div className={styles.listingGrid}>
-                {listings.map((listing) => (
+                {listings?.map((listing) => (
                   <div
                     key={listing.id}
                     className={styles.listingShortView}

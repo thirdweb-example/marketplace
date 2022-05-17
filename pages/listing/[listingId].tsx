@@ -1,5 +1,16 @@
-import { MediaRenderer, useMarketplace } from "@thirdweb-dev/react";
-import { AuctionListing, DirectListing, ListingType } from "@thirdweb-dev/sdk";
+import {
+  MediaRenderer,
+  useMarketplace,
+  useNetwork,
+  useNetworkMismatch,
+} from "@thirdweb-dev/react";
+import {
+  AuctionListing,
+  ChainId,
+  DirectListing,
+  ListingType,
+  NATIVE_TOKENS,
+} from "@thirdweb-dev/sdk";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
@@ -27,8 +38,12 @@ const ListingPage: NextPage = () => {
 
   // Initialize the marketplace contract
   const marketplace = useMarketplace(
-    process.env.NEXT_PUBLIC_MARKETPLACE_CONTRACT_ADDRESS // Your marketplace contract address here
+    "0x277C0FB19FeD09c785448B8d3a80a78e7A9B8952" // Your marketplace contract address here
   );
+
+  // Hooks to detect user is on the right network and switch them if they are not
+  const networkMismatch = useNetworkMismatch();
+  const [, switchNetwork] = useNetwork();
 
   // When the component mounts, ask the marketplace for the listing with the given listingId
   // Using the listingid from the URL (via router.query)
@@ -56,12 +71,18 @@ const ListingPage: NextPage = () => {
 
   async function createBidOrOffer() {
     try {
+      // Ensure user is on the correct network
+      if (networkMismatch) {
+        switchNetwork && switchNetwork(4);
+        return;
+      }
+
       // If the listing type is a direct listing, then we can create an offer.
       if (listing?.type === ListingType.Direct) {
         await marketplace?.direct.makeOffer(
           listingId, // The listingId of the listing we want to make an offer for
           1, // Quantity = 1
-          "0xc778417E063141139Fce010982780140Aa0cD5Ab", // WETH address on Rinkeby network
+          NATIVE_TOKENS[ChainId.Rinkeby].wrapped.address, // Wrapped Ether address on Rinkeby
           bidAmount // The offer amount the user entered
         );
       }
@@ -78,16 +99,24 @@ const ListingPage: NextPage = () => {
       );
     } catch (error) {
       console.error(error);
+      alert(error);
     }
   }
 
   async function buyNft() {
     try {
+      // Ensure user is on the correct network
+      if (networkMismatch) {
+        switchNetwork && switchNetwork(4);
+        return;
+      }
+
       // Simple one-liner for buying the NFT
       await marketplace?.buyoutListing(listingId, 1);
       alert("NFT bought successfully!");
     } catch (error) {
       console.error(error);
+      alert(error);
     }
   }
 

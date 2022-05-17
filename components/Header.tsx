@@ -2,9 +2,7 @@ import { useAddress, useMetamask, useDisconnect } from "@thirdweb-dev/react";
 import React from "react";
 import styles from "../styles/Home.module.css";
 
-type Props = {};
-
-export default function Header({}: Props) {
+export default function Header() {
   // Helpful thirdweb hooks to connect and manage the wallet from metamask.
   const address = useAddress();
   const connectWithMetamask = useMetamask();

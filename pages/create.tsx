@@ -1,4 +1,8 @@
-import { useMarketplace } from "@thirdweb-dev/react";
+import {
+  useMarketplace,
+  useNetwork,
+  useNetworkMismatch,
+} from "@thirdweb-dev/react";
 import { NATIVE_TOKEN_ADDRESS, TransactionResult } from "@thirdweb-dev/sdk";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
@@ -7,15 +11,23 @@ import styles from "../styles/Home.module.css";
 const Create: NextPage = () => {
   // Next JS Router hook to redirect to other pages
   const router = useRouter();
+  const networkMismatch = useNetworkMismatch();
+  const [, switchNetwork] = useNetwork();
 
   // Connect to our marketplace contract via the useMarketplace hook
   const marketplace = useMarketplace(
-    process.env.NEXT_PUBLIC_MARKETPLACE_CONTRACT_ADDRESS // Your marketplace contract address here
+    "0x277C0FB19FeD09c785448B8d3a80a78e7A9B8952" // Your marketplace contract address here
   );
 
   // This function gets called when the form is submitted.
   async function handleCreateListing(e: any) {
     try {
+      // Ensure user is on the correct network
+      if (networkMismatch) {
+        switchNetwork && switchNetwork(4);
+        return;
+      }
+
       // Prevent page from refreshing
       e.preventDefault();
 

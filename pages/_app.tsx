@@ -4,20 +4,14 @@ import { ChainId, ThirdwebProvider } from "@thirdweb-dev/react";
 import "../styles/globals.css";
 import Head from "next/head";
 import ThirdwebGuideFooter from "../components/ThirdwebGuideFooter";
-import ThirdwebGuideOverlay from "../components/ThirdwebGuideOverlay";
 import Header from "../components/Header";
 
 // This is the chainId your dApp will work on.
 const activeChainId = ChainId.Rinkeby;
 
 function MyApp({ Component, pageProps }: AppProps) {
-  const [showGuideOverlay, setShowGuideOverlay] = React.useState(false);
   return (
     <ThirdwebProvider desiredChainId={activeChainId}>
-      <ThirdwebGuideOverlay
-        show={showGuideOverlay}
-        setShow={setShowGuideOverlay}
-      />
       <Head>
         <title>thirdweb Marketplace with Next.JS</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -32,7 +26,7 @@ function MyApp({ Component, pageProps }: AppProps) {
       </Head>
       <Header />
       <Component {...pageProps} />
-      <ThirdwebGuideFooter onLearnMore={() => setShowGuideOverlay(true)} />
+      <ThirdwebGuideFooter />
     </ThirdwebProvider>
   );
 }

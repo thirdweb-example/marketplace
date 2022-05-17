@@ -15,19 +15,17 @@ By the end, we'll implement the following features:
 
 - [**thirdweb Marketplace**](https://portal.thirdweb.com/contracts/marketplace): to facilitate the listing of NFTs and enable users to make buy, sell, or make offers on the NFTs on the marketplace.
 - [**thirdweb NFT Collection**](https://portal.thirdweb.com/contracts/nft-collection): to create an ERC721 NFT Collection that we can list onto the marketplace.
-- [**thirdweb React SDK**](https://docs.thirdweb.com/react): to enable users to connect and disconnect their wallets with our website, and prompt them to approve transactions with MetaMask.
-- [**thirdweb TypeScript SDK**](https://docs.thirdweb.com/typescript): to connect to our NFT Collection Smart contract via TypeScript & React hooks such as [useMarketplace](https://docs.thirdweb.com/react/react.usemarketplace), mint new NFTs, create new listings, and view all of the listings for sale!
+- [**thirdweb React SDK**](https://docs.thirdweb.com/react): to enable users to connect and disconnect their wallets with our website, and access hooks such as [useMarketplace](https://portal.thirdweb.com/react/react.usemarketplace) and [useActiveListings](https://portal.thirdweb.com/react/react.useactivelistings) to interact with the marketplace.
+- [**thirdweb TypeScript SDK**](https://docs.thirdweb.com/typescript): to connect to our marketplace smart contract, create new listings, make offers and buy listings!
 - [**Next JS Dynamic Routes**](https://nextjs.org/docs/routing/dynamic-routes): so we can have a dynamic route for each listing. eg. `listing/1` will show listing 1.
 
 ## Using This Repo
 
-- Click on the **Use this template** button to create your own copy of this repo:
+- Clone this repository.
 
-![use this template.png](https://cdn.hashnode.com/res/hashnode/image/upload/v1651048077489/WeMVOeg6W.png)
+- Create your own Marketplace contract via the thirdweb dashboard. (Follow the steps in the guide below if you need extra help)!
 
-- Create your own Marketplace contract via the thirdweb dashboard. (follow the steps in the guide below if you need extra help)
-
-- Create a `.env.local` file and add your Marketplace contract address to it. In the form: `NEXT_PUBLIC_MARKETPLACE_CONTRACT_ADDRESS=0x00000`.
+- Replace all instances of our Marketplace contract address with your own, (wherever you see the `useMarketplace` hook).
 
 - Install the required dependencies:
 
@@ -98,25 +96,14 @@ const [listings, setListings] = useState<(AuctionListing | DirectListing)[]>(
 Then, we use the [useMarketplace](https://docs.thirdweb.com/react/react.usemarketplace) hook to connect to our smart contract via it's contract address.
 
 ```ts
-const marketplace = useMarketplace(
-  process.env.NEXT_PUBLIC_MARKETPLACE_CONTRACT_ADDRESS // Your marketplace contract address here
-);
+const marketplace = useMarketplace("your-marketplace-address-here");
 ```
 
-Once the marketplace is ready, we call `getActiveListings` inside a `useEffect` hook to get all of the listings that are currently active (i.e. haven't expired or sold already).
+Once the marketplace is ready, we can use the `useActiveListings` hook to get all of the listings that are currently active (i.e. haven't expired or sold already).
 
-```ts
-useEffect(() => {
-  (async () => {
-    if (marketplace) {
-      // Get all listings from the marketplace
-      setListings(await marketplace?.getActiveListings());
-
-      // Set loading to false when the listings are ready
-      setLoadingListings(false);
-    }
-  })();
-}, [marketplace?.getActiveListings]);
+```tsx
+const { data: listings, isLoading: loadingListings } =
+  useActiveListings(marketplace);
 ```
 
 Once we have the listings, we can display them to our users.
@@ -133,7 +120,7 @@ Once again, we are using the `useMarketplace` hook to connect to our marketplace
 
 ```ts
 const marketplace = useMarketplace(
-    process.env.NEXT_PUBLIC_MARKETPLACE_CONTRACT_ADDRESS
+    "your-marketplace-address-here"
   );
 };
 ```
@@ -150,7 +137,7 @@ async function createAuctionListing(
     const transaction = await marketplace?.auction.createListing({
       assetContractAddress: contractAddress, // Contract Address of the NFT
       buyoutPricePerToken: price, // Maximum price, the auction will end immediately if a user pays this price.
-      currencyContractAddress: NATIVE_TOKEN_ADDRESS, // NATIVE_TOKEN_ADDRESS is the cryptocurency that is native to the network. i.e. Rinkeby ETH.
+      currencyContractAddress: NATIVE_TOKEN_ADDRESS, // NATIVE_TOKEN_ADDRESS is the cryptocurency that is native to the network. i.e. Rinkeby Ether
       listingDurationInSeconds: 60 * 60 * 24 * 7, // When the auction will be closed and no longer accept bids (1 Week)
       quantity: 1, // How many of the NFTs are being listed (useful for ERC 1155 tokens)
       reservePricePerToken: 0, // Minimum price, users cannot bid below this amount
@@ -177,7 +164,7 @@ async function createDirectListing(
     const transaction = await marketplace?.direct.createListing({
       assetContractAddress: contractAddress, // Contract Address of the NFT
       buyoutPricePerToken: price, // Maximum price, the auction will end immediately if a user pays this price.
-      currencyContractAddress: NATIVE_TOKEN_ADDRESS, // NATIVE_TOKEN_ADDRESS is the cryptocurency that is native to the network. i.e. Rinkeby ETH.
+      currencyContractAddress: NATIVE_TOKEN_ADDRESS, // NATIVE_TOKEN_ADDRESS is the cryptocurency that is native to the network. i.e. Rinkeby Ether.
       listingDurationInSeconds: 60 * 60 * 24 * 7, // When the auction will be closed and no longer accept bids (1 Week)
       quantity: 1, // How many of the NFTs are being listed (useful for ERC 1155 tokens)
       startTimestamp: new Date(0), // When the listing will start (now)
@@ -209,9 +196,7 @@ When the user visits the `/listing/[listingId]` page, we can fetch the informati
 **Fetching The Listing**
 
 ```ts
-const marketplace = useMarketplace(
-  process.env.NEXT_PUBLIC_MARKETPLACE_CONTRACT_ADDRESS
-);
+const marketplace = useMarketplace("your-marketplace-address-here");
 
 useEffect(() => {
   if (!listingId || !marketplace) {
@@ -239,7 +224,7 @@ async function createBidOrOffer() {
       await marketplace?.direct.makeOffer(
         listingId, // The listingId of the listing we want to make an offer for
         1, // Quantity = 1
-        "0xc778417E063141139Fce010982780140Aa0cD5Ab", // WETH address on Rinkeby network
+        NATIVE_TOKENS[ChainId.Rinkeby].wrapped.address, // Wrapped Ether address on Rinkeby
         bidAmount // The offer amount the user entered
       );
     }
