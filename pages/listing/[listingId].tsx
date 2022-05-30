@@ -3,17 +3,12 @@ import {
   useMarketplace,
   useNetwork,
   useNetworkMismatch,
+  useListing,
 } from "@thirdweb-dev/react";
-import {
-  AuctionListing,
-  ChainId,
-  DirectListing,
-  ListingType,
-  NATIVE_TOKENS,
-} from "@thirdweb-dev/sdk";
+import { ChainId, ListingType, NATIVE_TOKENS } from "@thirdweb-dev/sdk";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import styles from "../../styles/Home.module.css";
 
 const ListingPage: NextPage = () => {
@@ -25,41 +20,23 @@ const ListingPage: NextPage = () => {
   // If the user visits /listing/1 then the listingId will be 1.
   const { listingId } = router.query as { listingId: string };
 
-  // Loading flag for the UI, so we can show a loading state while we wait for the data to load.
-  const [loadingListing, setLoadingListing] = useState<boolean>(true);
-
-  // Store the bid amount the user entered into the bidding textbox
-  const [bidAmount, setBidAmount] = useState<string>("");
-
-  // Storing this listing in a state variable so we can use it in the UI once it's fetched.
-  const [listing, setListing] = useState<
-    undefined | DirectListing | AuctionListing
-  >(undefined);
+  // Hooks to detect user is on the right network and switch them if they are not
+  const networkMismatch = useNetworkMismatch();
+  const [, switchNetwork] = useNetwork();
 
   // Initialize the marketplace contract
   const marketplace = useMarketplace(
     "0x277C0FB19FeD09c785448B8d3a80a78e7A9B8952" // Your marketplace contract address here
   );
 
-  // Hooks to detect user is on the right network and switch them if they are not
-  const networkMismatch = useNetworkMismatch();
-  const [, switchNetwork] = useNetwork();
+  // Fetch the listing from the marketplace contract
+  const { data: listing, isLoading: loadingListing } = useListing(
+    marketplace,
+    listingId
+  );
 
-  // When the component mounts, ask the marketplace for the listing with the given listingId
-  // Using the listingid from the URL (via router.query)
-  useEffect(() => {
-    if (!listingId || !marketplace) {
-      return;
-    }
-    (async () => {
-      // Pass the listingId into the getListing function to get the listing with the given listingId
-      const l = await marketplace.getListing(listingId);
-
-      // Update state accordingly
-      setLoadingListing(false);
-      setListing(l);
-    })();
-  }, [listingId, marketplace]);
+  // Store the bid amount the user entered into the bidding textbox
+  const [bidAmount, setBidAmount] = useState<string>("");
 
   if (loadingListing) {
     return <div className={styles.loadingOrError}>Loading...</div>;

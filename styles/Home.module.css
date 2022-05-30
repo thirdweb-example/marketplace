@@ -40,7 +40,6 @@
   align-items: center;
   justify-content: center;
   width: 100vw;
-  padding: 0 24px;
 }
 
 .page {
@@ -249,7 +248,7 @@
   align-items: center;
   justify-content: flex-start;
   flex-wrap: wrap;
-  width: 95vw;
+  width: 90vw;
   gap: 1%;
 }
 

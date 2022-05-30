@@ -1,4 +1,5 @@
 import { useAddress, useMetamask, useDisconnect } from "@thirdweb-dev/react";
+import Link from "next/link";
 import React from "react";
 import styles from "../styles/Home.module.css";
 
@@ -12,13 +13,14 @@ export default function Header() {
     <div className={styles.header}>
       <div className={styles.left}>
         <div>
-          <a
-            href="https://thirdweb.com/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <img src={`/logo.png`} alt="Thirdweb Logo" width={135} />
-          </a>
+          <Link href="/" passHref role="button">
+            <img
+              src={`/logo.png`}
+              alt="Thirdweb Logo"
+              width={135}
+              style={{ cursor: "pointer" }}
+            />
+          </Link>
         </div>
       </div>
       <div className={styles.right}>
