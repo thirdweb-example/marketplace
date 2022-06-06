@@ -2,7 +2,7 @@ import styles from "../../styles/Thirdweb.module.css";
 import React from "react";
 
 export default function ThirdwebGuideFooter() {
-  const url = "https://github.com/thirdweb-example/marketplace-next-ts";
+  const url = "https://mining.game";
   return (
     <>
       <div
@@ -29,8 +29,8 @@ export default function ThirdwebGuideFooter() {
         }}
       >
         <img
-          src={"/github.png"}
-          alt="github url"
+          src={"/bg5.png"}
+          alt="main url"
           width={40}
           height={40}
           role="button"
