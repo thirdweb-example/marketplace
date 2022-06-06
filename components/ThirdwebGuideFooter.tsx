@@ -29,8 +29,8 @@ export default function ThirdwebGuideFooter() {
         }}
       >
         <img
-          src={"/bg5.png"}
-          alt="main url"
+          src={"/WATT-logo250x250.png"}
+          alt="Back to Mining Game"
           width={40}
           height={40}
           role="button"
