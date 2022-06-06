@@ -21,29 +21,15 @@ By the end, we'll implement the following features:
 
 ## Using This Repo
 
-- Clone this repository.
+Create a project using this example by running:
+
+```bash
+npx create-tw-app --example marketplace-next-ts
+```
 
 - Create your own Marketplace contract via the thirdweb dashboard. (Follow the steps in the guide below if you need extra help)!
 
 - Replace all instances of our Marketplace contract address with your own, (wherever you see the `useMarketplace` hook).
-
-- Install the required dependencies:
-
-```bash
-npm install
-# or
-yarn install
-```
-
-- Run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-```
-
-- Visit http://localhost:3000/ to view the demo.
 
 Need More help? Want to understand the code a bit more? Want to set the project up yourself? Follow the guide below! 👇
 
