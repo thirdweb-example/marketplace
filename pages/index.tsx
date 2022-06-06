@@ -38,7 +38,7 @@ const Home: NextPage = () => {
               Mining Game
             </a> 
           </b>{" "}
-          NFT's.
+          NFTs.
         </p>
 
         <hr className={styles.divider} />
