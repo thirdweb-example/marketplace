@@ -13,7 +13,7 @@ const Home: NextPage = () => {
 
   // Connect your marketplace smart contract here (replace this address)
   const marketplace = useMarketplace(
-    "0x277C0FB19FeD09c785448B8d3a80a78e7A9B8952" // Your marketplace contract address here
+    "0x3A2eD82DD0f77281a9cDAea9b04566556AA7243f" // Your marketplace contract address here
   );
 
   const { data: listings, isLoading: loadingListings } =
@@ -24,9 +24,9 @@ const Home: NextPage = () => {
       {/* Content */}
       <div className={styles.container}>
         {/* Top Section */}
-        <h1 className={styles.h1}>NFT Marketplace w/ thirdweb + Next.JS</h1>
+        <h1 className={styles.h1}>Mining GameNFT Marketplace</h1>
         <p className={styles.explain}>
-          Build an NFT marketplace using{" "}
+          Buy, auction and sell {" "}
           <b>
             {" "}
             <a
@@ -35,10 +35,10 @@ const Home: NextPage = () => {
               rel="noopener noreferrer"
               className={styles.purple}
             >
-              thirdweb
-            </a>
+              Mining Game
+            </a> 
           </b>{" "}
-          to list your ERC721 and ERC1155 tokens for auction or for direct sale.
+          NFT's.
         </p>
 
         <hr className={styles.divider} />
