@@ -24,7 +24,7 @@ const Home: NextPage = () => {
       {/* Content */}
       <div className={styles.container}>
         {/* Top Section */}
-        <h1 className={styles.h1}>Mining GameNFT Marketplace</h1>
+        <h1 className={styles.h1}>Mining Game NFT Marketplace</h1>
         <p className={styles.explain}>
           Buy, auction and sell {" "}
           <b>
