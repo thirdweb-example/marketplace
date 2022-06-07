@@ -23,7 +23,7 @@ function MyApp({ Component, pageProps }: AppProps) {
           name="keywords"
           content="Marketplace, NFT Marketplace, NFT Auction, OpenSea"
         />
-        <link rel="shortcut icon" href="https://nft-marketplace-zeta-five.vercel.app/logo.png" />
+        <link rel="shortcut icon" href="https://nft-marketplace-zeta-five.vercel.app/favicon.ico" />
       </Head>
       <Header />
       <Component {...pageProps} />
