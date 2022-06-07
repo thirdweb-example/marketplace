@@ -13,7 +13,7 @@ const Home: NextPage = () => {
 
   // Connect your marketplace smart contract here (replace this address)
   const marketplace = useMarketplace(
-    "0x3A2eD82DD0f77281a9cDAea9b04566556AA7243f" // Your marketplace contract address here
+    "0xD0804F2cDFC75A308d786DcA78f0DC617d991CaE" // Your marketplace contract address here
   );
 
   const { data: listings, isLoading: loadingListings } =
@@ -30,7 +30,7 @@ const Home: NextPage = () => {
           <b>
             {" "}
             <a
-              href="https://thirdweb.com/"
+              href="https://mining.game/"
               target="_blank"
               rel="noopener noreferrer"
               className={styles.purple}

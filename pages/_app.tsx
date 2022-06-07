@@ -7,7 +7,7 @@ import ThirdwebGuideFooter from "../components/ThirdwebGuideFooter";
 import Header from "../components/Header";
 
 // This is the chainId your dApp will work on.
-const activeChainId = ChainId.Mumbai;
+const activeChainId = ChainId.Polygon;
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
@@ -23,7 +23,7 @@ function MyApp({ Component, pageProps }: AppProps) {
           name="keywords"
           content="Marketplace, NFT Marketplace, NFT Auction, OpenSea"
         />
-        <link rel="shortcut icon" href="https://nft-marketplace-zeta-five.vercel.app/favicon.ico" />
+        <link rel="shortcut icon" href="https://shop.mining.game/favicon.ico" />
       </Head>
       <Header />
       <Component {...pageProps} />
