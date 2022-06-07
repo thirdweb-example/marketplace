@@ -17,7 +17,7 @@ export default function Header() {
             <img
               src={`/logo.png`}
               alt="Mining Game Logo"
-              width={270}
+              width={350}
               style={{ cursor: "pointer" }}
             />
           </Link>
