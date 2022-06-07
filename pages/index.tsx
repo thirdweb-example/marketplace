@@ -40,7 +40,9 @@ const Home: NextPage = () => {
           </b>{" "}
           NFTs.
         </p>
-
+        <p className={styles.explain}>
+        WATT received here WILL BE BURNED!
+        </p>
         <hr className={styles.divider} />
 
 
