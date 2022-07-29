@@ -66,7 +66,7 @@ const connectWithMetamask = useMetamask();
 
 ## Displaying Listings On The Marketplace
 
-On the [index.tsx file](pages/index.tsx), we're displaying all of the current **active** listings on the marketplace.
+On the [index.tsx file](./pages/index.tsx), we're displaying all of the current **active** listings on the marketplace.
 
 We're using React's `useState` to store the listings as well as a loading flag.
 
@@ -94,11 +94,11 @@ const { data: listings, isLoading: loadingListings } =
 
 Once we have the listings, we can display them to our users.
 
-We'll leave the details of how best to display the listings up to you, but if you're looking for an example, check out the code in our [index.tsx file](pages/index.tsx) file.
+We'll leave the details of how best to display the listings up to you, but if you're looking for an example, check out the code in our [index.tsx file](./pages/index.tsx) file.
 
 ## Listing Items on the marketplace
 
-We have a page called [create.tsx](pages/create.tsx) that lets users upload existing NFTs onto the marketplace.
+We have a page called [create.tsx](./pages/create.tsx) that lets users upload existing NFTs onto the marketplace.
 
 If you don't have NFTs that you can list, [you can create an NFT Collection via our dashboard](https://thirdweb.com/dashboard).
 
@@ -238,7 +238,7 @@ async function buyNft() {
 }
 ```
 
-We attach these functions to the `onClick` handlers of our `Buy` and `Make Offer` buttons. If you want to see how we do that, check out the code in our [[listingId].tsx file](pages/listing/[listingId].tsx) page.
+We attach these functions to the `onClick` handlers of our `Buy` and `Make Offer` buttons. If you want to see how we do that, check out the code in our [[listingId].tsx file](./pages/listing/[listingId].tsx) page.
 
 **Note:** For making offers, you'll need to have an ERC20 token. For our Rinkeby marketplace, that means you'll need to have wrapped ETH (wETH).
 
