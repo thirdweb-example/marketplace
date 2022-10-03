@@ -1,11 +1,11 @@
 import {
   MediaRenderer,
-  useMarketplace,
   useNetwork,
   useNetworkMismatch,
   useListing,
+  useContract,
 } from "@thirdweb-dev/react";
-import { ChainId, ListingType, NATIVE_TOKENS } from "@thirdweb-dev/sdk";
+import { ChainId, ListingType, Marketplace, NATIVE_TOKENS } from "@thirdweb-dev/sdk";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useState } from "react";
@@ -25,7 +25,7 @@ const ListingPage: NextPage = () => {
   const [, switchNetwork] = useNetwork();
 
   // Initialize the marketplace contract
-  const marketplace = useMarketplace(
+  const { contract: marketplace } = useContract<Marketplace>(
     "0x277C0FB19FeD09c785448B8d3a80a78e7A9B8952" // Your marketplace contract address here
   );
 

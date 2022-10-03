@@ -4,15 +4,16 @@ import Link from "next/link";
 import {
   MediaRenderer,
   useActiveListings,
-  useMarketplace,
+  useContract,
 } from "@thirdweb-dev/react";
 import { useRouter } from "next/router";
+import { Marketplace } from "@thirdweb-dev/sdk";
 
 const Home: NextPage = () => {
   const router = useRouter();
 
   // Connect your marketplace smart contract here (replace this address)
-  const marketplace = useMarketplace(
+  const { contract: marketplace } = useContract<Marketplace>(
     "0x277C0FB19FeD09c785448B8d3a80a78e7A9B8952" // Your marketplace contract address here
   );
 
