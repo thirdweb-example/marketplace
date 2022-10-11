@@ -24,7 +24,7 @@ By the end, we'll implement the following features:
 Create a project using this example by running:
 
 ```bash
-npx thirdweb create --template marketplace-next-ts
+npx thirdweb create --template marketplace
 ```
 
 - Create your own Marketplace contract via the thirdweb dashboard. (Follow the steps in the guide below if you need extra help)!
