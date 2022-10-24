@@ -1,9 +1,9 @@
 import {
   MediaRenderer,
-  useMarketplace,
   useNetwork,
   useNetworkMismatch,
   useListing,
+  useContract,
 } from "@thirdweb-dev/react";
 import { ChainId, ListingType, NATIVE_TOKENS } from "@thirdweb-dev/sdk";
 import type { NextPage } from "next";
@@ -25,8 +25,9 @@ const ListingPage: NextPage = () => {
   const [, switchNetwork] = useNetwork();
 
   // Initialize the marketplace contract
-  const marketplace = useMarketplace(
-    "0x277C0FB19FeD09c785448B8d3a80a78e7A9B8952" // Your marketplace contract address here
+  const { contract: marketplace } = useContract(
+    "0x6fd541801fdbA210Ab3587E2Ff5333Bf78411288", // Your marketplace contract address here
+    "marketplace"
   );
 
   // Fetch the listing from the marketplace contract
@@ -50,7 +51,7 @@ const ListingPage: NextPage = () => {
     try {
       // Ensure user is on the correct network
       if (networkMismatch) {
-        switchNetwork && switchNetwork(4);
+        switchNetwork && switchNetwork(ChainId.Goerli);
         return;
       }
 
@@ -59,7 +60,7 @@ const ListingPage: NextPage = () => {
         await marketplace?.direct.makeOffer(
           listingId, // The listingId of the listing we want to make an offer for
           1, // Quantity = 1
-          NATIVE_TOKENS[ChainId.Rinkeby].wrapped.address, // Wrapped Ether address on Rinkeby
+          NATIVE_TOKENS[ChainId.Goerli].wrapped.address, // Wrapped Ether address on Goerli
           bidAmount // The offer amount the user entered
         );
       }
@@ -84,7 +85,7 @@ const ListingPage: NextPage = () => {
     try {
       // Ensure user is on the correct network
       if (networkMismatch) {
-        switchNetwork && switchNetwork(4);
+        switchNetwork && switchNetwork(ChainId.Goerli);
         return;
       }
 

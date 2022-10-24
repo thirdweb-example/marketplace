@@ -1,9 +1,13 @@
 import {
-  useMarketplace,
+  useContract,
   useNetwork,
   useNetworkMismatch,
 } from "@thirdweb-dev/react";
-import { NATIVE_TOKEN_ADDRESS, TransactionResult } from "@thirdweb-dev/sdk";
+import {
+  ChainId,
+  NATIVE_TOKEN_ADDRESS,
+  TransactionResult,
+} from "@thirdweb-dev/sdk";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
 import styles from "../styles/Home.module.css";
@@ -15,8 +19,9 @@ const Create: NextPage = () => {
   const [, switchNetwork] = useNetwork();
 
   // Connect to our marketplace contract via the useMarketplace hook
-  const marketplace = useMarketplace(
-    "0x277C0FB19FeD09c785448B8d3a80a78e7A9B8952" // Your marketplace contract address here
+  const { contract: marketplace } = useContract(
+    "0x6fd541801fdbA210Ab3587E2Ff5333Bf78411288", // Your marketplace contract address here
+    "marketplace"
   );
 
   // This function gets called when the form is submitted.
@@ -24,7 +29,7 @@ const Create: NextPage = () => {
     try {
       // Ensure user is on the correct network
       if (networkMismatch) {
-        switchNetwork && switchNetwork(4);
+        switchNetwork && switchNetwork(ChainId.Goerli);
         return;
       }
 
@@ -75,7 +80,7 @@ const Create: NextPage = () => {
       const transaction = await marketplace?.auction.createListing({
         assetContractAddress: contractAddress, // Contract Address of the NFT
         buyoutPricePerToken: price, // Maximum price, the auction will end immediately if a user pays this price.
-        currencyContractAddress: NATIVE_TOKEN_ADDRESS, // NATIVE_TOKEN_ADDRESS is the crpyto curency that is native to the network. i.e. Rinkeby ETH.
+        currencyContractAddress: NATIVE_TOKEN_ADDRESS, // NATIVE_TOKEN_ADDRESS is the crpyto curency that is native to the network. i.e. Goerli ETH.
         listingDurationInSeconds: 60 * 60 * 24 * 7, // When the auction will be closed and no longer accept bids (1 Week)
         quantity: 1, // How many of the NFTs are being listed (useful for ERC 1155 tokens)
         reservePricePerToken: 0, // Minimum price, users cannot bid below this amount
@@ -98,7 +103,7 @@ const Create: NextPage = () => {
       const transaction = await marketplace?.direct.createListing({
         assetContractAddress: contractAddress, // Contract Address of the NFT
         buyoutPricePerToken: price, // Maximum price, the auction will end immediately if a user pays this price.
-        currencyContractAddress: NATIVE_TOKEN_ADDRESS, // NATIVE_TOKEN_ADDRESS is the crpyto curency that is native to the network. i.e. Rinkeby ETH.
+        currencyContractAddress: NATIVE_TOKEN_ADDRESS, // NATIVE_TOKEN_ADDRESS is the crpyto curency that is native to the network. i.e. Goerli ETH.
         listingDurationInSeconds: 60 * 60 * 24 * 7, // When the auction will be closed and no longer accept bids (1 Week)
         quantity: 1, // How many of the NFTs are being listed (useful for ERC 1155 tokens)
         startTimestamp: new Date(0), // When the listing will start

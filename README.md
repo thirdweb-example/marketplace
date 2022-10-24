@@ -2,7 +2,7 @@
 
 ## Introduction
 
-In this guide, you will learn how to create a marketplace like [OpenSea](https://opensea.io/) on the Rinkeby Ethereum test network!
+In this guide, you will learn how to create a marketplace like [OpenSea](https://opensea.io/) on the Goerli Ethereum test network!
 
 By the end, we'll implement the following features:
 
@@ -51,7 +51,7 @@ The thirdweb React provider makes it straightforward to let your users connect t
 Open `pages/_app.tsx` we wrap all of our pages in the `<ThirdwebProvider>` component.
 
 ```tsx
-<ThirdwebProvider desiredChainId={ChainId.Rinkeby}>
+<ThirdwebProvider desiredChainId={ChainId.Goerli}>
   <Component {...pageProps} />
 </ThirdwebProvider>
 ```
@@ -123,7 +123,7 @@ async function createAuctionListing(
     const transaction = await marketplace?.auction.createListing({
       assetContractAddress: contractAddress, // Contract Address of the NFT
       buyoutPricePerToken: price, // Maximum price, the auction will end immediately if a user pays this price.
-      currencyContractAddress: NATIVE_TOKEN_ADDRESS, // NATIVE_TOKEN_ADDRESS is the cryptocurency that is native to the network. i.e. Rinkeby Ether
+      currencyContractAddress: NATIVE_TOKEN_ADDRESS, // NATIVE_TOKEN_ADDRESS is the cryptocurency that is native to the network. i.e. Goerli Ether
       listingDurationInSeconds: 60 * 60 * 24 * 7, // When the auction will be closed and no longer accept bids (1 Week)
       quantity: 1, // How many of the NFTs are being listed (useful for ERC 1155 tokens)
       reservePricePerToken: 0, // Minimum price, users cannot bid below this amount
@@ -150,7 +150,7 @@ async function createDirectListing(
     const transaction = await marketplace?.direct.createListing({
       assetContractAddress: contractAddress, // Contract Address of the NFT
       buyoutPricePerToken: price, // Maximum price, the auction will end immediately if a user pays this price.
-      currencyContractAddress: NATIVE_TOKEN_ADDRESS, // NATIVE_TOKEN_ADDRESS is the cryptocurency that is native to the network. i.e. Rinkeby Ether.
+      currencyContractAddress: NATIVE_TOKEN_ADDRESS, // NATIVE_TOKEN_ADDRESS is the cryptocurency that is native to the network. i.e. Goerli Ether.
       listingDurationInSeconds: 60 * 60 * 24 * 7, // When the auction will be closed and no longer accept bids (1 Week)
       quantity: 1, // How many of the NFTs are being listed (useful for ERC 1155 tokens)
       startTimestamp: new Date(0), // When the listing will start (now)
@@ -210,7 +210,7 @@ async function createBidOrOffer() {
       await marketplace?.direct.makeOffer(
         listingId, // The listingId of the listing we want to make an offer for
         1, // Quantity = 1
-        NATIVE_TOKENS[ChainId.Rinkeby].wrapped.address, // Wrapped Ether address on Rinkeby
+        NATIVE_TOKENS[ChainId.Goerli].wrapped.address, // Wrapped Ether address on Goerli
         bidAmount // The offer amount the user entered
       );
     }
@@ -240,7 +240,7 @@ async function buyNft() {
 
 We attach these functions to the `onClick` handlers of our `Buy` and `Make Offer` buttons. If you want to see how we do that, check out the code in our [[listingId].tsx file](./pages/listing/[listingId].tsx) page.
 
-**Note:** For making offers, you'll need to have an ERC20 token. For our Rinkeby marketplace, that means you'll need to have wrapped ETH (wETH).
+**Note:** For making offers, you'll need to have an ERC20 token. For our Goerli marketplace, that means you'll need to have wrapped ETH (wETH).
 
 ## Join our Discord!
 
