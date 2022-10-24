@@ -4,7 +4,7 @@ import {
   useNetworkMismatch,
 } from "@thirdweb-dev/react";
 import {
-  Marketplace,
+  ChainId,
   NATIVE_TOKEN_ADDRESS,
   TransactionResult,
 } from "@thirdweb-dev/sdk";
