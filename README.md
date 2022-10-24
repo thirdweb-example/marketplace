@@ -15,7 +15,7 @@ By the end, we'll implement the following features:
 
 - [**thirdweb Marketplace**](https://portal.thirdweb.com/contracts/marketplace): to facilitate the listing of NFTs and enable users to make buy, sell, or make offers on the NFTs on the marketplace.
 - [**thirdweb NFT Collection**](https://portal.thirdweb.com/contracts/nft-collection): to create an ERC721 NFT Collection that we can list onto the marketplace.
-- [**thirdweb React SDK**](https://docs.thirdweb.com/react): to enable users to connect and disconnect their wallets with our website, and access hooks such as [useMarketplace](https://portal.thirdweb.com/react/react.usemarketplace) and [useActiveListings](https://portal.thirdweb.com/react/react.useactivelistings) to interact with the marketplace.
+- [**thirdweb React SDK**](https://docs.thirdweb.com/react): to enable users to connect and disconnect their wallets with our website, and access hooks such as [useContract](https://portal.thirdweb.com/react/react.usecontract) and [useActiveListings](https://portal.thirdweb.com/react/react.useactivelistings) to interact with the marketplace.
 - [**thirdweb TypeScript SDK**](https://docs.thirdweb.com/typescript): to connect to our marketplace smart contract, create new listings, make offers and buy listings!
 - [**Next JS Dynamic Routes**](https://nextjs.org/docs/routing/dynamic-routes): so we can have a dynamic route for each listing. eg. `listing/1` will show listing 1.
 
@@ -24,12 +24,12 @@ By the end, we'll implement the following features:
 Create a project using this example by running:
 
 ```bash
-npx thirdweb create --template marketplace-next-ts
+npx thirdweb create --template marketplace
 ```
 
 - Create your own Marketplace contract via the thirdweb dashboard. (Follow the steps in the guide below if you need extra help)!
 
-- Replace all instances of our Marketplace contract address with your own, (wherever you see the `useMarketplace` hook).
+- Replace all instances of our Marketplace contract address with your own, (wherever you see the `useContract` hook).
 
 Need More help? Want to understand the code a bit more? Want to set the project up yourself? Follow the guide below! 👇
 
@@ -79,10 +79,10 @@ const [listings, setListings] = useState<(AuctionListing | DirectListing)[]>(
 );
 ```
 
-Then, we use the [useMarketplace](https://docs.thirdweb.com/react/react.usemarketplace) hook to connect to our smart contract via it's contract address.
+Then, we use the [useContract](https://docs.thirdweb.com/react/react.useContract) hook to connect to our smart contract via it's contract address.
 
 ```ts
-const marketplace = useMarketplace("your-marketplace-address-here");
+const { contract: marketplace } = useContract("your-marketplace-address-here", "marketplace");
 ```
 
 Once the marketplace is ready, we can use the `useActiveListings` hook to get all of the listings that are currently active (i.e. haven't expired or sold already).
@@ -102,13 +102,13 @@ We have a page called [create.tsx](./pages/create.tsx) that lets users upload ex
 
 If you don't have NFTs that you can list, [you can create an NFT Collection via our dashboard](https://thirdweb.com/dashboard).
 
-Once again, we are using the `useMarketplace` hook to connect to our marketplace smart contract via it's contract address.
+Once again, we are using the `useContract` hook to connect to our marketplace smart contract via it's contract address.
 
 ```ts
-const marketplace = useMarketplace(
-    "your-marketplace-address-here"
+const { contract: marketplace } = useContract(
+    "your-marketplace-address-here",
+    "marketplace"
   );
-};
 ```
 
 **Create Auction Type Listing:**
@@ -182,7 +182,7 @@ When the user visits the `/listing/[listingId]` page, we can fetch the informati
 **Fetching The Listing**
 
 ```ts
-const marketplace = useMarketplace("your-marketplace-address-here");
+const { contract: marketplace } = useContract("your-marketplace-address-here", "marketplace");
 
 useEffect(() => {
   if (!listingId || !marketplace) {

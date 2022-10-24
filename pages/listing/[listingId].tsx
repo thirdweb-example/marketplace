@@ -5,7 +5,12 @@ import {
   useListing,
   useContract,
 } from "@thirdweb-dev/react";
-import { ChainId, ListingType, NATIVE_TOKENS } from "@thirdweb-dev/sdk";
+import {
+  ChainId,
+  ListingType,
+  Marketplace,
+  NATIVE_TOKENS,
+} from "@thirdweb-dev/sdk";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useState } from "react";
@@ -26,7 +31,7 @@ const ListingPage: NextPage = () => {
 
   // Initialize the marketplace contract
   const { contract: marketplace } = useContract(
-    "0x6fd541801fdbA210Ab3587E2Ff5333Bf78411288", // Your marketplace contract address here
+    "0x277C0FB19FeD09c785448B8d3a80a78e7A9B8952", // Your marketplace contract address here
     "marketplace"
   );
 

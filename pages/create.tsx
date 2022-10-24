@@ -4,7 +4,7 @@ import {
   useNetworkMismatch,
 } from "@thirdweb-dev/react";
 import {
-  ChainId,
+  Marketplace,
   NATIVE_TOKEN_ADDRESS,
   TransactionResult,
 } from "@thirdweb-dev/sdk";
@@ -18,9 +18,9 @@ const Create: NextPage = () => {
   const networkMismatch = useNetworkMismatch();
   const [, switchNetwork] = useNetwork();
 
-  // Connect to our marketplace contract via the useMarketplace hook
+  // Connect to our marketplace contract via the useContract hook
   const { contract: marketplace } = useContract(
-    "0x6fd541801fdbA210Ab3587E2Ff5333Bf78411288", // Your marketplace contract address here
+    "0x277C0FB19FeD09c785448B8d3a80a78e7A9B8952", // Your marketplace contract address here
     "marketplace"
   );
 
