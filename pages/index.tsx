@@ -7,19 +7,12 @@ import {
   useContract,
 } from "@thirdweb-dev/react";
 import { useRouter } from "next/router";
-import { Marketplace } from "@thirdweb-dev/sdk";
+import { marketplaceContractAddress } from "../addresses";
 
 const Home: NextPage = () => {
   const router = useRouter();
-
-  // Connect your marketplace smart contract here (replace this address)
-  const { contract: marketplace } = useContract(
-    "0x277C0FB19FeD09c785448B8d3a80a78e7A9B8952", // Your marketplace contract address here
-    "marketplace"
-  );
-
-  const { data: listings, isLoading: loadingListings } =
-    useActiveListings(marketplace);
+  const { contract: marketplace } = useContract(marketplaceContractAddress, "marketplace");
+  const { data: listings, isLoading: loadingListings } = useActiveListings(marketplace);
 
   return (
     <>
