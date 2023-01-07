@@ -29,7 +29,7 @@ npx thirdweb create --template marketplace
 
 - Create your own Marketplace contract via the thirdweb dashboard. (Follow the steps in the guide below if you need extra help)!
 
-- Replace all instances of our Marketplace contract address with your own, (wherever you see the `useContract` hook).
+- Replace the marketplace contract address with yours in [addresses.ts](/addresses.ts) file
 
 Need More help? Want to understand the code a bit more? Want to set the project up yourself? Follow the guide below! 👇
 

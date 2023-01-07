@@ -10,6 +10,7 @@ import {
 } from "@thirdweb-dev/sdk";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
+import { marketplaceContractAddress } from "../addresses";
 import styles from "../styles/Home.module.css";
 
 const Create: NextPage = () => {
@@ -19,10 +20,7 @@ const Create: NextPage = () => {
   const [, switchNetwork] = useNetwork();
 
   // Connect to our marketplace contract via the useContract hook
-  const { contract: marketplace } = useContract(
-    "0x277C0FB19FeD09c785448B8d3a80a78e7A9B8952", // Your marketplace contract address here
-    "marketplace"
-  );
+  const { contract: marketplace } = useContract(marketplaceContractAddress, "marketplace");
 
   // This function gets called when the form is submitted.
   async function handleCreateListing(e: any) {

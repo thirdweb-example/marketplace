@@ -14,6 +14,7 @@ import {
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useState } from "react";
+import { marketplaceContractAddress } from "../../addresses";
 import styles from "../../styles/Home.module.css";
 
 const ListingPage: NextPage = () => {
@@ -30,10 +31,7 @@ const ListingPage: NextPage = () => {
   const [, switchNetwork] = useNetwork();
 
   // Initialize the marketplace contract
-  const { contract: marketplace } = useContract(
-    "0x277C0FB19FeD09c785448B8d3a80a78e7A9B8952", // Your marketplace contract address here
-    "marketplace"
-  );
+  const { contract: marketplace } = useContract(marketplaceContractAddress, "marketplace");
 
   // Fetch the listing from the marketplace contract
   const { data: listing, isLoading: loadingListing } = useListing(
