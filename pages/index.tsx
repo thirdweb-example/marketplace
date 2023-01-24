@@ -39,10 +39,8 @@ const Home: NextPage = () => {
         <hr className={styles.divider} />
 
         <div style={{ marginTop: 32, marginBottom: 32 }}>
-          <Link href="/create">
-            <a className={styles.mainButton} style={{ textDecoration: "none" }}>
-              Create A Listing
-            </a>
+          <Link href="/create" className={styles.mainButton} style={{ textDecoration: "none" }}>
+            Create A Listing
           </Link>
         </div>
 
@@ -70,8 +68,8 @@ const Home: NextPage = () => {
                       }}
                     />
                     <h2 className={styles.nameContainer}>
-                      <Link href={`/listing/${listing.id}`}>
-                        <a className={styles.name}>{listing.asset.name}</a>
+                      <Link href={`/listing/${listing.id}`} className={styles.name}>
+                        {listing.asset.name}
                       </Link>
                     </h2>
 
