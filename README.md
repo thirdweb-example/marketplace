@@ -51,7 +51,7 @@ The thirdweb React provider makes it straightforward to let your users connect t
 Open `pages/_app.tsx` we wrap all of our pages in the `<ThirdwebProvider>` component.
 
 ```tsx
-<ThirdwebProvider desiredChainId={ChainId.Goerli}>
+<ThirdwebProvider activeChain="goerli">
   <Component {...pageProps} />
 </ThirdwebProvider>
 ```
@@ -82,7 +82,10 @@ const [listings, setListings] = useState<(AuctionListing | DirectListing)[]>(
 Then, we use the [useContract](https://docs.thirdweb.com/react/react.useContract) hook to connect to our smart contract via it's contract address.
 
 ```ts
-const { contract: marketplace } = useContract("your-marketplace-address-here", "marketplace");
+const { contract: marketplace } = useContract(
+  "your-marketplace-address-here",
+  "marketplace"
+);
 ```
 
 Once the marketplace is ready, we can use the `useActiveListings` hook to get all of the listings that are currently active (i.e. haven't expired or sold already).
@@ -106,9 +109,9 @@ Once again, we are using the `useContract` hook to connect to our marketplace sm
 
 ```ts
 const { contract: marketplace } = useContract(
-    "your-marketplace-address-here",
-    "marketplace"
-  );
+  "your-marketplace-address-here",
+  "marketplace"
+);
 ```
 
 **Create Auction Type Listing:**
@@ -182,7 +185,10 @@ When the user visits the `/listing/[listingId]` page, we can fetch the informati
 **Fetching The Listing**
 
 ```ts
-const { contract: marketplace } = useContract("your-marketplace-address-here", "marketplace");
+const { contract: marketplace } = useContract(
+  "your-marketplace-address-here",
+  "marketplace"
+);
 
 useEffect(() => {
   if (!listingId || !marketplace) {
